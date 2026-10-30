@@ -249,18 +249,52 @@ async def api_get_testimoni():
     conn.close()
     return {"status": "success", "data": [dict(r) for r in rows]}
 
+from backend.supabase_client import (
+    is_supabase_enabled,
+    supabase_insert_ppdb,
+    supabase_get_ppdb,
+    supabase_get_all_ppdb,
+    supabase_update_ppdb_status,
+    supabase_insert_pesan,
+    supabase_get_all_pesan,
+    supabase_get_raport
+)
+
 # PPDB Endpoints
 @app.post("/api/ppdb/register")
 async def api_ppdb_register(data: PPDBRegistrationCreate):
-    """Submit a new PPDB Online application."""
+    """Submit a new PPDB Online application with Supabase Cloud & SQLite dual-sync."""
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    # Generate unique registration number
     random_num = random.randint(100, 999)
     timestamp_suffix = str(int(time.time()))[-3:]
     nomor_registrasi = f"REG-2026-WS{timestamp_suffix}{random_num}"
 
+    payload_dict = {
+        "nomor_registrasi": nomor_registrasi,
+        "nama_lengkap": data.nama_lengkap.strip(),
+        "nisn": data.nisn.strip(),
+        "nik": data.nik.strip() if data.nik else "",
+        "jenis_kelamin": data.jenis_kelamin,
+        "tempat_lahir": data.tempat_lahir or "",
+        "tanggal_lahir": data.tanggal_lahir or "",
+        "asal_sekolah": data.asal_sekolah.strip(),
+        "nama_wali": data.nama_wali.strip(),
+        "no_wa_wali": data.no_wa_wali.strip(),
+        "alamat_lengkap": data.alamat_lengkap or "",
+        "jalur_pendaftaran": data.jalur_pendaftaran,
+        "pilihan_peminatan": data.pilihan_peminatan or "Reguler & Tahfidz",
+        "status_seleksi": "Menunggu Verifikasi Berkas",
+        "catatan": "Pendaftaran daring berhasil diterima sistem. Silakan simpan nomor registrasi ini."
+    }
+
+    # 1. Save to Supabase Cloud if enabled
+    supabase_record = None
+    if is_supabase_enabled():
+        supabase_record = supabase_insert_ppdb(payload_dict)
+
+    # 2. Save to SQLite (always keep local/serverless fallback)
     try:
         cursor.execute("""
         INSERT INTO ppdb_pendaftar (
@@ -271,42 +305,53 @@ async def api_ppdb_register(data: PPDBRegistrationCreate):
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             nomor_registrasi,
-            data.nama_lengkap.strip(),
-            data.nisn.strip(),
-            data.nik.strip() if data.nik else "",
-            data.jenis_kelamin,
-            data.tempat_lahir or "",
-            data.tanggal_lahir or "",
-            data.asal_sekolah.strip(),
-            data.nama_wali.strip(),
-            data.no_wa_wali.strip(),
-            data.alamat_lengkap or "",
-            data.jalur_pendaftaran,
-            data.pilihan_peminatan or "Reguler & Tahfidz",
-            "Menunggu Verifikasi Berkas",
-            "Pendaftaran daring berhasil diterima sistem. Silakan simpan nomor registrasi ini."
+            payload_dict["nama_lengkap"],
+            payload_dict["nisn"],
+            payload_dict["nik"],
+            payload_dict["jenis_kelamin"],
+            payload_dict["tempat_lahir"],
+            payload_dict["tanggal_lahir"],
+            payload_dict["asal_sekolah"],
+            payload_dict["nama_wali"],
+            payload_dict["no_wa_wali"],
+            payload_dict["alamat_lengkap"],
+            payload_dict["jalur_pendaftaran"],
+            payload_dict["pilihan_peminatan"],
+            payload_dict["status_seleksi"],
+            payload_dict["catatan"]
         ))
         conn.commit()
     except Exception as e:
-        conn.close()
-        raise HTTPException(status_code=400, detail=f"Gagal memproses pendaftaran: {str(e)}")
+        if not supabase_record:
+            conn.close()
+            raise HTTPException(status_code=400, detail=f"Gagal memproses pendaftaran: {str(e)}")
 
-    # Fetch inserted record
     row = cursor.execute("SELECT * FROM ppdb_pendaftar WHERE nomor_registrasi = ?", (nomor_registrasi,)).fetchone()
     conn.close()
+
+    final_data = supabase_record if supabase_record else (dict(row) if row else payload_dict)
 
     return {
         "status": "success",
         "message": "Pendaftaran PPDB berhasil tersimpan!",
         "nomor_registrasi": nomor_registrasi,
-        "data": dict(row)
+        "storage": "supabase_cloud" if supabase_record else "sqlite",
+        "data": final_data
     }
 
 @app.get("/api/ppdb/check/{query}")
 async def api_ppdb_check(query: str):
-    """Check PPDB status by registration number or NISN."""
-    conn = get_db_connection()
+    """Check PPDB status with Supabase priority and SQLite fallback."""
     q = query.strip()
+
+    # 1. Try Supabase first if enabled
+    if is_supabase_enabled():
+        sb_data = supabase_get_ppdb(q)
+        if sb_data:
+            return {"status": "success", "storage": "supabase_cloud", "data": sb_data}
+
+    # 2. Fallback to SQLite
+    conn = get_db_connection()
     row = conn.execute("""
     SELECT * FROM ppdb_pendaftar 
     WHERE UPPER(nomor_registrasi) = UPPER(?) OR nisn = ?
@@ -320,17 +365,30 @@ async def api_ppdb_check(query: str):
         }
     return {
         "status": "success",
+        "storage": "sqlite",
         "data": dict(row)
     }
 
 @app.get("/api/ppdb/stats")
 async def api_ppdb_stats():
     """Get summary statistics of PPDB applicants."""
-    conn = get_db_connection()
-    total = conn.execute("SELECT COUNT(*) FROM ppdb_pendaftar").fetchone()[0]
-    diterima = conn.execute("SELECT COUNT(*) FROM ppdb_pendaftar WHERE status_seleksi LIKE '%Diterima%'").fetchone()[0]
-    verifikasi = conn.execute("SELECT COUNT(*) FROM ppdb_pendaftar WHERE status_seleksi LIKE '%Verifikasi%'").fetchone()[0]
-    conn.close()
+    total = 0
+    diterima = 0
+    verifikasi = 0
+
+    if is_supabase_enabled():
+        sb_list = supabase_get_all_ppdb()
+        if sb_list is not None:
+            total = len(sb_list)
+            diterima = sum(1 for item in sb_list if "diterima" in item.get("status_seleksi", "").lower())
+            verifikasi = sum(1 for item in sb_list if "verifikasi" in item.get("status_seleksi", "").lower())
+
+    if total == 0:
+        conn = get_db_connection()
+        total = conn.execute("SELECT COUNT(*) FROM ppdb_pendaftar").fetchone()[0]
+        diterima = conn.execute("SELECT COUNT(*) FROM ppdb_pendaftar WHERE status_seleksi LIKE '%Diterima%'").fetchone()[0]
+        verifikasi = conn.execute("SELECT COUNT(*) FROM ppdb_pendaftar WHERE status_seleksi LIKE '%Verifikasi%'").fetchone()[0]
+        conn.close()
 
     return {
         "status": "success",
@@ -344,9 +402,15 @@ async def api_ppdb_stats():
 # Academic Report / Raport Lookup
 @app.post("/api/raport/check")
 async def api_raport_check(data: RaportCheckRequest):
-    """Check student report & graduation verification by NISN."""
-    conn = get_db_connection()
+    """Check student report & graduation verification with Supabase & SQLite fallback."""
     nisn_clean = data.nisn.strip()
+
+    if is_supabase_enabled():
+        sb_raport = supabase_get_raport(nisn_clean)
+        if sb_raport:
+            return {"status": "success", "storage": "supabase_cloud", "data": sb_raport}
+
+    conn = get_db_connection()
     row = conn.execute("SELECT * FROM siswa_raport WHERE nisn = ?", (nisn_clean,)).fetchone()
     conn.close()
 
@@ -357,6 +421,7 @@ async def api_raport_check(data: RaportCheckRequest):
         }
     return {
         "status": "success",
+        "storage": "sqlite",
         "data": dict(row)
     }
 
@@ -364,21 +429,35 @@ async def api_raport_check(data: RaportCheckRequest):
 @app.post("/api/kontak")
 async def api_kirim_pesan(data: PesanKontakCreate):
     """Submit contact or consultation form."""
+    msg_dict = {
+        "nama": data.nama.strip(),
+        "email": data.email.strip() if data.email else "",
+        "no_whatsapp": data.no_whatsapp.strip(),
+        "kategori": data.kategori,
+        "subjek": data.subjek.strip(),
+        "pesan": data.pesan.strip(),
+        "status": "Belum Dibaca"
+    }
+
+    if is_supabase_enabled():
+        supabase_insert_pesan(msg_dict)
+
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute("""
     INSERT INTO pesan_kontak (nama, email, no_whatsapp, kategori, subjek, pesan)
     VALUES (?, ?, ?, ?, ?, ?)
     """, (
-        data.nama.strip(),
-        data.email.strip() if data.email else "",
-        data.no_whatsapp.strip(),
-        data.kategori,
-        data.subjek.strip(),
-        data.pesan.strip()
+        msg_dict["nama"],
+        msg_dict["email"],
+        msg_dict["no_whatsapp"],
+        msg_dict["kategori"],
+        msg_dict["subjek"],
+        msg_dict["pesan"]
     ))
     conn.commit()
     conn.close()
+
     return {
         "status": "success",
         "message": "Pesan Anda telah berhasil dikirim ke Humas SMP Islam Walisongo 2 Depok. Tim kami akan segera merespons via WhatsApp."
@@ -493,8 +572,20 @@ async def api_admin_overview():
     recent_pesan = conn.execute("SELECT * FROM pesan_kontak ORDER BY id DESC LIMIT 5").fetchall()
     conn.close()
 
+    # If Supabase enabled, merge cloud records
+    if is_supabase_enabled():
+        sb_ppdb = supabase_get_all_ppdb()
+        sb_pesan = supabase_get_all_pesan()
+        if sb_ppdb is not None:
+            total_ppdb = len(sb_ppdb)
+            recent_ppdb = sb_ppdb[:5]
+        if sb_pesan is not None:
+            total_pesan = len(sb_pesan)
+            recent_pesan = sb_pesan[:5]
+
     return {
         "status": "success",
+        "storage": "supabase_cloud" if is_supabase_enabled() else "sqlite",
         "stats": {
             "total_ppdb": total_ppdb,
             "total_berita": total_berita,
@@ -502,17 +593,22 @@ async def api_admin_overview():
             "total_pesan": total_pesan,
             "pesan_baru": pesan_baru
         },
-        "recent_ppdb": [dict(r) for r in recent_ppdb],
-        "recent_pesan": [dict(p) for p in recent_pesan]
+        "recent_ppdb": [dict(r) if isinstance(r, dict) else dict(r) for r in recent_ppdb],
+        "recent_pesan": [dict(p) if isinstance(p, dict) else dict(p) for p in recent_pesan]
     }
 
 @app.get("/api/admin/ppdb-all")
 async def api_admin_ppdb_all():
     """Fetch all PPDB applicants for admin view."""
+    if is_supabase_enabled():
+        sb_list = supabase_get_all_ppdb()
+        if sb_list is not None:
+            return {"status": "success", "storage": "supabase_cloud", "data": sb_list}
+
     conn = get_db_connection()
     rows = conn.execute("SELECT * FROM ppdb_pendaftar ORDER BY id DESC").fetchall()
     conn.close()
-    return {"status": "success", "data": [dict(r) for r in rows]}
+    return {"status": "success", "storage": "sqlite", "data": [dict(r) for r in rows]}
 
 @app.post("/api/admin/ppdb-update-status")
 async def api_admin_ppdb_update(
@@ -521,6 +617,9 @@ async def api_admin_ppdb_update(
     catatan: str = Form("")
 ):
     """Update selection status of a PPDB applicant."""
+    if is_supabase_enabled():
+        supabase_update_ppdb_status(id, status, catatan)
+
     conn = get_db_connection()
     conn.execute("""
     UPDATE ppdb_pendaftar 
