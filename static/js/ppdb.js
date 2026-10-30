@@ -80,7 +80,7 @@ function showPpdbSuccessModal(res) {
       <div id="printableReceipt" style="background:#ffffff; border:2px dashed #059669; border-radius:16px; padding:2rem; text-align:left;">
         <!-- Header Receipt -->
         <div style="display:flex; align-items:center; gap:1rem; border-bottom:2px solid #064e3b; padding-bottom:1rem; margin-bottom:1.25rem;">
-          <img src="/static/images/logo-walisongo.svg" style="width:65px; height:65px;" alt="Logo Walisongo">
+          <img src="/static/images/logo-sekolah.png" style="width:65px; height:65px; object-fit:contain;" alt="Logo Walisongo">
           <div>
             <h3 style="color:#064e3b; font-size:1.15rem; font-weight:800; margin:0;">SMP ISLAM WALISONGO 2 DEPOK</h3>
             <p style="font-size:0.75rem; color:#d97706; font-weight:700; margin:0;">YAYASAN PONDOK PESANTREN HJ. DARDJAH AMIN</p>
