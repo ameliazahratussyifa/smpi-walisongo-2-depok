@@ -25,6 +25,21 @@ from backend.auth import (
     hash_password, verify_password, create_session_token,
     get_current_user, COOKIE_NAME, SESSION_DURATION_SECONDS
 )
+from backend.supabase_client import (
+    is_supabase_enabled,
+    supabase_insert_ppdb,
+    supabase_get_ppdb,
+    supabase_get_all_ppdb,
+    supabase_update_ppdb_status,
+    supabase_insert_pesan,
+    supabase_get_all_pesan,
+    supabase_get_raport,
+    supabase_get_user,
+    supabase_get_all_users,
+    supabase_insert_user,
+    supabase_update_user_password,
+    supabase_update_user_last_login
+)
 
 # Initialize Database & Seed data if necessary
 try:
@@ -246,23 +261,41 @@ async def api_auth_login(
 ):
     """Authenticate Master or Admin credentials and issue secure session cookie."""
     clean_username = username.strip().lower()
-    conn = get_db_connection()
-    user_row = conn.execute(
-        "SELECT * FROM users WHERE username = ? AND is_active = 1",
-        (clean_username,)
-    ).fetchone()
+    user_row = None
+
+    # 1. Try Cloud Supabase if active
+    if is_supabase_enabled():
+        sb_user = supabase_get_user(clean_username)
+        if sb_user:
+            user_row = sb_user
+
+    # 2. SQLite local/serverless fallback
+    if not user_row:
+        conn = get_db_connection()
+        db_res = conn.execute(
+            "SELECT * FROM users WHERE username = ? AND is_active = 1",
+            (clean_username,)
+        ).fetchone()
+        if db_res:
+            user_row = dict(db_res)
+        conn.close()
 
     if not user_row or not verify_password(password, user_row["password_hash"]):
-        conn.close()
         raise HTTPException(
             status_code=401,
             detail="Nama pengguna (username) atau kata sandi tidak sesuai. Silakan periksa kembali."
         )
 
-    # Update last login timestamp
-    conn.execute("UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?", (user_row["id"],))
-    conn.commit()
-    conn.close()
+    # Update last login timestamp in both
+    if is_supabase_enabled():
+        supabase_update_user_last_login(user_row["id"])
+    try:
+        conn = get_db_connection()
+        conn.execute("UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?", (user_row["id"],))
+        conn.commit()
+        conn.close()
+    except Exception:
+        pass
 
     token = create_session_token(
         user_id=user_row["id"],
@@ -279,7 +312,7 @@ async def api_auth_login(
             "username": user_row["username"],
             "role": user_row["role"],
             "nama_lengkap": user_row["nama_lengkap"],
-            "email": user_row["email"]
+            "email": user_row.get("email")
         }
     })
 
@@ -317,14 +350,19 @@ async def admin_page(request: Request):
     if not user:
         return RedirectResponse(url="/login?notice=silakan_login&redirect=/admin", status_code=303)
 
-    conn = get_db_connection()
     all_users = []
     if user["role"] == "master":
-        user_rows = conn.execute(
-            "SELECT id, username, nama_lengkap, role, email, is_active, created_at, last_login FROM users ORDER BY id ASC"
-        ).fetchall()
-        all_users = [dict(u) for u in user_rows]
-    conn.close()
+        if is_supabase_enabled():
+            sb_users = supabase_get_all_users()
+            if sb_users:
+                all_users = sb_users
+        if not all_users:
+            conn = get_db_connection()
+            user_rows = conn.execute(
+                "SELECT id, username, nama_lengkap, role, email, is_active, created_at, last_login FROM users ORDER BY id ASC"
+            ).fetchall()
+            all_users = [dict(u) for u in user_rows]
+            conn.close()
 
     return templates.TemplateResponse(
         request=request,
@@ -399,17 +437,6 @@ async def api_get_testimoni():
     rows = conn.execute("SELECT * FROM testimoni ORDER BY id ASC").fetchall()
     conn.close()
     return {"status": "success", "data": [dict(r) for r in rows]}
-
-from backend.supabase_client import (
-    is_supabase_enabled,
-    supabase_insert_ppdb,
-    supabase_get_ppdb,
-    supabase_get_all_ppdb,
-    supabase_update_ppdb_status,
-    supabase_insert_pesan,
-    supabase_get_all_pesan,
-    supabase_get_raport
-)
 
 # PPDB Endpoints
 @app.post("/api/ppdb/register")
@@ -826,6 +853,18 @@ async def api_admin_create_user(
         raise HTTPException(status_code=400, detail=f"Username '{clean_username}' sudah digunakan.")
 
     hashed_pw = hash_password(password)
+    user_payload = {
+        "username": clean_username,
+        "password_hash": hashed_pw,
+        "nama_lengkap": nama_lengkap.strip(),
+        "role": role,
+        "email": email.strip(),
+        "is_active": 1
+    }
+
+    if is_supabase_enabled():
+        supabase_insert_user(user_payload)
+
     conn.execute("""
     INSERT INTO users (username, password_hash, nama_lengkap, role, email, is_active)
     VALUES (?, ?, ?, ?, ?, 1)
@@ -849,8 +888,11 @@ async def api_admin_reset_password(
     if len(new_password) < 6:
         raise HTTPException(status_code=400, detail="Kata sandi baru minimal 6 karakter.")
 
-    conn = get_db_connection()
     hashed_pw = hash_password(new_password)
+    if is_supabase_enabled():
+        supabase_update_user_password(user_id, hashed_pw)
+
+    conn = get_db_connection()
     conn.execute("UPDATE users SET password_hash = ? WHERE id = ?", (hashed_pw, user_id))
     conn.commit()
     conn.close()

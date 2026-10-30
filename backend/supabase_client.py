@@ -110,3 +110,63 @@ def supabase_get_raport(nisn: str) -> Optional[Dict[str, Any]]:
     except Exception as e:
         print(f"[Supabase Raport Error] {e}")
     return None
+
+# ==================== USERS / AUTH METHODS ====================
+
+def supabase_get_user(username: str) -> Optional[Dict[str, Any]]:
+    sb = get_supabase()
+    if not sb:
+        return None
+    try:
+        res = sb.table("users").select("*").eq("username", username.strip().lower()).limit(1).execute()
+        if res.data and len(res.data) > 0:
+            return res.data[0]
+    except Exception as e:
+        print(f"[Supabase Get User Notice] {e}")
+    return None
+
+def supabase_get_all_users() -> Optional[List[Dict[str, Any]]]:
+    sb = get_supabase()
+    if not sb:
+        return None
+    try:
+        res = sb.table("users").select("id, username, nama_lengkap, role, email, is_active, created_at, last_login").order("id", desc=False).execute()
+        return res.data
+    except Exception as e:
+        print(f"[Supabase Get All Users Notice] {e}")
+    return None
+
+def supabase_insert_user(data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    sb = get_supabase()
+    if not sb:
+        return None
+    try:
+        res = sb.table("users").insert(data).execute()
+        if res.data and len(res.data) > 0:
+            return res.data[0]
+    except Exception as e:
+        print(f"[Supabase Insert User Error] {e}")
+    return None
+
+def supabase_update_user_password(user_id: int, hashed_password: str) -> bool:
+    sb = get_supabase()
+    if not sb:
+        return False
+    try:
+        sb.table("users").update({"password_hash": hashed_password}).eq("id", user_id).execute()
+        return True
+    except Exception as e:
+        print(f"[Supabase Update Password Error] {e}")
+        return False
+
+def supabase_update_user_last_login(user_id: int) -> bool:
+    sb = get_supabase()
+    if not sb:
+        return False
+    try:
+        sb.table("users").update({"last_login": "now()"}).eq("id", user_id).execute()
+        return True
+    except Exception as e:
+        print(f"[Supabase Update Last Login Notice] {e}")
+        return False
+
