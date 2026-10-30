@@ -53,6 +53,31 @@ if STATIC_DIR.exists():
 
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
+# Vercel Serverless Path Normalizer Middleware
+@app.middleware("http")
+async def vercel_path_normalizer(request: Request, call_next):
+    """
+    On Vercel, catch-all rewrites direct traffic to /api/index.py.
+    This middleware restores the original requested path from Vercel's
+    'x-matched-path' or 'x-forwarded-uri' headers, or strips the /api/index.py prefix.
+    """
+    matched_path = request.headers.get("x-matched-path") or request.headers.get("x-forwarded-uri")
+    if matched_path:
+        clean_path = matched_path.split("?")[0]
+        if not clean_path.startswith("/api/index.py"):
+            request.scope["path"] = clean_path
+        elif clean_path == "/api/index.py":
+            request.scope["path"] = "/"
+    else:
+        current_path = request.scope.get("path", "")
+        if current_path in ("/api/index.py", "/api"):
+            request.scope["path"] = "/"
+        elif current_path.startswith("/api/index.py/"):
+            request.scope["path"] = current_path[len("/api/index.py"):]
+
+    response = await call_next(request)
+    return response
+
 # School Profile Static Metadata
 SCHOOL_INFO = {
     "nama": "SMP Islam Walisongo 2 Depok",
@@ -99,6 +124,8 @@ SCHOOL_INFO = {
 # ==================== PAGE CONTROLLERS ====================
 
 @app.get("/", response_class=HTMLResponse)
+@app.get("/api", response_class=HTMLResponse)
+@app.get("/api/index.py", response_class=HTMLResponse)
 async def home_page(request: Request):
     """Main Web Portal with stunning modern UI, responsive for all devices."""
     conn = get_db_connection()
