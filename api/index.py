@@ -228,6 +228,13 @@ async def api_school_info():
     """Get complete school profile metadata."""
     return {"status": "success", "data": SCHOOL_INFO}
 
+@app.get("/api/debug-headers")
+async def debug_headers(request: Request):
+    return {
+        "path": request.scope.get("path"),
+        "headers": {k: v for k, v in request.headers.items() if any(w in k.lower() for w in ["matched", "uri", "forward", "url", "path", "route"])}
+    }
+
 @app.get("/api/berita")
 async def api_get_berita(kategori: str = None):
     """Get news and announcements."""
