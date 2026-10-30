@@ -114,6 +114,13 @@ async def vercel_path_normalizer(request: Request, call_next):
 
     response = await call_next(request)
 
+    # Security Hardening Headers (Protection against XSS, Clickjacking, MIME sniffing)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=(self)"
+
     # Performance: Enable Browser & Edge Caching for static assets (CSS, JS, SVG, Images)
     req_path = request.scope.get("path", "")
     if req_path.startswith("/static/") or req_path.endswith((".css", ".js", ".svg", ".png", ".jpg", ".woff2")):

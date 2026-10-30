@@ -1,0 +1,120 @@
+/* ==========================================================================
+   PROGRAM UNGGULAN & AKADEMIK
+   Matches Reference 3 "Program Studi Unggulan"
+   ========================================================================== */
+.section-programs {
+  padding: 5rem 0;
+  background: var(--slate-50);
+}
+
+.section-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header-text-block {
+  max-width: 650px;
+}
+
+.btn-view-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--primary-700);
+  transition: gap var(--transition-fast);
+}
+
+.btn-view-all:hover {
+  gap: 0.65rem;
+  color: var(--primary-800);
+}
+
+.programs-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+.program-card {
+  background: var(--white);
+  border: 1px solid var(--slate-200);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-normal);
+  position: relative;
+}
+
+.program-card:hover {
+  border-color: var(--primary-400);
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+.program-top-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.program-level-tag {
+  background: var(--primary-100);
+  color: var(--primary-800);
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+}
+
+.program-badge-status {
+  background: var(--gold-100);
+  color: var(--gold-700);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+}
+
+.program-name {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--slate-900);
+  margin-bottom: 0.85rem;
+}
+
+.program-summary {
+  font-size: 0.9375rem;
+  color: var(--slate-600);
+  line-height: 1.6;
+  margin-bottom: 1.75rem;
+  flex-grow: 1;
+}
+
+.program-card-footer {
+  border-top: 1px solid var(--slate-100);
+  padding-top: 1.25rem;
+}
+
+.link-program-detail {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--primary-700);
+  cursor: pointer;
+}
+
+.link-program-detail:hover {
+  color: var(--gold-600);
+}
+
