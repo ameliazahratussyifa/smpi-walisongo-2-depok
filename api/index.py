@@ -128,6 +128,12 @@ SCHOOL_INFO = {
 @app.get("/api/index.py", response_class=HTMLResponse)
 async def home_page(request: Request):
     """Main Web Portal with stunning modern UI, responsive for all devices."""
+    if "x-debug-inspect" in request.headers:
+        return JSONResponse({
+            "scope_path": request.scope.get("path"),
+            "headers": dict(request.headers)
+        })
+
     conn = get_db_connection()
     berita_list = conn.execute("SELECT * FROM berita ORDER BY id DESC LIMIT 4").fetchall()
     guru_list = conn.execute("SELECT * FROM guru ORDER BY urutan ASC LIMIT 6").fetchall()
