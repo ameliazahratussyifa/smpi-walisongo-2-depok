@@ -1,0 +1,45 @@
+<!-- ==================== BERITA & PENGUMUMAN ==================== -->
+<section id="berita" class="section-news">
+  <div class="container">
+    <div class="section-header-row">
+      <div class="header-text-block">
+        <span class="section-pill-tag">PUBLIKASI TERKINI</span>
+        <h2 class="section-title">Berita & Pengumuman Sekolah</h2>
+        <p style="color: #64748b; font-size: 0.95rem;">Informasi resmi, agenda kegiatan kesiswaan, dan catatan prestasi terkini SMP Islam Walisongo 2 Depok.</p>
+      </div>
+      <div>
+        <a href="#berita" class="btn-view-all">LIHAT ARSIP BERITA ➔</a>
+      </div>
+    </div>
+
+    <!-- Filter Buttons -->
+    <div class="news-filter-tabs">
+      <button class="news-tab-btn active" data-filter="all">Semua Informasi</button>
+      <button class="news-tab-btn" data-filter="Pengumuman PPDB">Pengumuman PPDB</button>
+      <button class="news-tab-btn" data-filter="Prestasi Siswa">Prestasi Siswa</button>
+      <button class="news-tab-btn" data-filter="Kegiatan Kesiswaan">Kegiatan Santri</button>
+      <button class="news-tab-btn" data-filter="Inovasi Edukasi">Inovasi Edukasi</button>
+    </div>
+
+    <div class="news-grid">
+      {% for b in berita_list %}
+      <article class="news-card" data-category="{{ b.kategori }}">
+        <div class="news-thumb-wrap">
+          <img src="{{ b.gambar }}" alt="{{ b.judul }}" class="news-img">
+          <span class="news-tag-badge">{{ b.kategori }}</span>
+        </div>
+        <div class="news-content">
+          <span class="news-date">📅 {{ b.tanggal }} • Oleh {{ b.penulis }}</span>
+          <h3 class="news-card-title">{{ b.judul }}</h3>
+          <p class="news-card-excerpt">{{ b.ringkasan }}</p>
+          <div>
+            <span class="news-card-btn" onclick="showArticleModal({{ b.id }})">
+              BACA SELENGKAPNYA ➔
+            </span>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>

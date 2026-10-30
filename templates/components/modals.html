@@ -1,0 +1,62 @@
+<!-- ==================== MODAL: SAMBUTAN KEPSEK FULL ==================== -->
+<div id="modalSambutan" class="modal-backdrop">
+  <div class="modal-window">
+    <div class="modal-header">
+      <h3 class="modal-header-title">📜 Sambutan Lengkap Kepala Sekolah</h3>
+      <button class="btn-close-modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.25rem;">
+        <img src="/static/images/guru-kepsek.svg" alt="Kepsek" style="width:60px; height:60px; border-radius:12px; border:2px solid #f59e0b;">
+        <div>
+          <h4 style="color:#0369a1; font-size:1.1rem; font-weight:800; margin:0;">{{ school.kepala_sekolah }}</h4>
+          <p style="color:#64748b; font-size:0.85rem; margin:0;">Kepala Sekolah SMP Islam Walisongo 2 Depok</p>
+        </div>
+      </div>
+      <div style="font-size:0.95rem; color:#334155; line-height:1.75; display:flex; flex-direction:column; gap:1rem;">
+        <p><em>Assalamu'alaikum Warahmatullahi Wabarakatuh,</em></p>
+        <p>Puji dan syukur senantiasa kita panjatkan ke hadirat Allah SWT, Rabb semesta alam, yang telah menganugerahkan taufiq dan hidayah-Nya. Shalawat beriring salam semoga senantiasa tercurah kepada junjungan kita Nabi Agung Muhammad SAW, keluarga, sahabat, dan para pengikutnya hingga akhir zaman.</p>
+        <p>Sebagai lembaga pendidikan formal yang bernafaskan nilai-nilai Islam Ahlussunnah wal Jama'ah di bawah naungan <strong>Yayasan Pondok Pesantren Hj. Dardjah Amin</strong>, SMP Islam Walisongo 2 Depok mengemban amanah suci untuk melahirkan generasi yang tidak hanya cerdas secara nalar sains, tetapi juga kukuh dalam adab dan akidah.</p>
+        <p>Pendidikan di SMP Islam Walisongo 2 Depok mengintegrasikan <strong>Kurikulum Merdeka</strong> dengan program unggulan Tahfidzul Qur'an, kecakapan berbahasa asing (Arab & Inggris), serta literasi digital modern. Kami mendidik anak-anak kita dengan kasih sayang, keteladanan, dan disiplin tinggi melalui pembiasaan ibadah harian serta kepanduan Pramuka BRAVIA.</p>
+        <p>Kami menyambut hangat para orang tua yang ingin mengamanahkan putra-putrinya untuk tumbuh bersama kami. Mari bersama-sama kita ikhtiarkan generasi terbaik yang akan menjadi kebanggaan keluarga, agama, dan bangsa.</p>
+        <p><em>Wassalamu'alaikum Warahmatullahi Wabarakatuh.</em></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: ARTICLE READER ==================== -->
+<div id="modalArticleReader" class="modal-backdrop">
+  <div class="modal-window">
+    <div class="modal-header">
+      <h3 class="modal-header-title" id="articleModalTitle">Detail Berita</h3>
+      <button class="btn-close-modal">&times;</button>
+    </div>
+    <div class="modal-body" id="articleModalBody">
+      <!-- Injected by showArticleModal -->
+    </div>
+  </div>
+</div>
+
+<script>
+// Show Article in Modal
+async function showArticleModal(id) {
+  try {
+    const res = await fetch(`/api/berita/${id}`);
+    const data = await res.json();
+    if (data.status === 'success') {
+      const b = data.data;
+      document.getElementById('articleModalTitle').textContent = b.kategori;
+      document.getElementById('articleModalBody').innerHTML = `
+        <h2 style="font-size:1.4rem; font-weight:800; color:#0f172a; margin-bottom:0.5rem; line-height:1.3;">${b.judul}</h2>
+        <p style="font-size:0.8rem; color:#64748b; margin-bottom:1rem;">📅 Dipublikasikan pada ${b.tanggal} oleh <strong>${b.penulis}</strong></p>
+        <img src="${b.gambar}" style="width:100%; height:240px; object-fit:cover; border-radius:12px; margin-bottom:1.25rem;">
+        <div style="font-size:0.95rem; color:#334155; line-height:1.75; white-space:pre-wrap;">${b.konten}</div>
+      `;
+      openModal('modalArticleReader');
+    }
+  } catch (e) {
+    showToast('Gagal memuat artikel', 'error');
+  }
+}
+</script>

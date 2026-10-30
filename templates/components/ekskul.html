@@ -1,0 +1,32 @@
+<!-- ==================== EKSTRAKURIKULER SHOWCASE ==================== -->
+<section id="ekskul" style="padding: 4.5rem 0; background: #ffffff;">
+  <div class="container">
+    <div class="section-header-row">
+      <div class="header-text-block">
+        <span class="section-pill-tag">PENGEMBANGAN MINAT & BAKAT</span>
+        <h2 class="section-title">Ekstrakurikuler Pilihan Santri Berprestasi</h2>
+        <p style="color: #64748b; font-size: 0.95rem;">Menyalurkan bakat dan hobi santri secara positif, terarah, serta menghasilkan prestasi di tingkat kota maupun provinsi.</p>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+      {% for e in ekskul_list %}
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:1.5rem; transition:all 0.25s ease;" onmouseover="this.style.borderColor='#0284c7'; this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+          <span style="background:#e0f2fe; color:#0369a1; font-size:0.75rem; font-weight:800; padding:0.25rem 0.65rem; border-radius:999px;">{{ e.kategori }}</span>
+          <span style="background:#fef3c7; color:#b45309; font-size:0.75rem; font-weight:700; padding:0.25rem 0.5rem; border-radius:6px;">{{ e.badge }}</span>
+        </div>
+        <h3 style="font-size:1.15rem; font-weight:800; color:#0f172a; margin-bottom:0.5rem;">{{ e.nama }}</h3>
+        <p style="font-size:0.875rem; color:#64748b; line-height:1.6; margin-bottom:1rem;">{{ e.deskripsi }}</p>
+        <div style="border-top:1px dashed #cbd5e1; padding-top:0.75rem; font-size:0.8rem; color:#334155;">
+          <p><strong>Pembina:</strong> {{ e.pembina }}</p>
+          <p><strong>Jadwal:</strong> {{ e.jadwal }}</p>
+          {% if e.prestasi %}
+          <p style="color:#0284c7; font-weight:700; margin-top:0.25rem;">🏅 {{ e.prestasi }}</p>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

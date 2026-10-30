@@ -1,0 +1,30 @@
+<!-- ==================== CERITA DARI SANTRI & WALI MURID ==================== -->
+<section class="section-testimonials">
+  <div class="container">
+    <div class="section-header-row">
+      <div class="header-text-block">
+        <span class="section-pill-tag">SUARA SIVITAS & ALUMNI</span>
+        <h2 class="section-title">Cerita dari Siswa, Wali Murid & Alumni</h2>
+        <p style="color: #64748b; font-size: 0.95rem;">Pengalaman nyata belajar, bertumbuh, menghafal Al-Qur'an, dan meraih prestasi di lingkungan asri SMP Islam Walisongo 2 Depok.</p>
+      </div>
+    </div>
+
+    <div class="testimonials-grid">
+      {% for t in testimoni_list %}
+      <div class="testimonial-card">
+        <div>
+          <div class="quote-icon-mark">“</div>
+          <p class="testimonial-text">{{ t.pesan }}</p>
+        </div>
+        <div class="testimonial-author-meta">
+          <div class="author-avatar-circle">{{ t.avatar_initials }}</div>
+          <div>
+            <div class="author-name">{{ t.nama }}</div>
+            <div class="author-sub">{{ t.status }} • {{ t.angkatan_relasi }}</div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>

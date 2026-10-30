@@ -3,6 +3,7 @@
 {% block title %}SMP Islam Walisongo 2 Depok - Beriman, Cerdas, dan Berakhlakul Karimah{% endblock %}
 
 {% block extra_css %}
+<!-- Leaflet Map CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
 <style>
   /* Styling spesifik peta kampus seperti gambar 1 */
@@ -87,663 +88,71 @@
 {% endblock %}
 
 {% block content %}
-<!-- ==================== HERO SECTION ==================== -->
-<section class="hero-section">
-  <!-- Glowing visual elements & grid -->
-  <div class="hero-backdrop-glow"></div>
-  <div class="hero-orb hero-orb-1"></div>
-  <div class="hero-orb hero-orb-2"></div>
+  {# 1. Hero Section #}
+  {% include "components/hero.html" %}
 
-  <div class="container hero-content-grid">
-    <!-- Left Column: Copy & Actions -->
-    <div>
-      <div class="hero-pill-badge">
-        <span>✨</span> TAHFIDZUL QUR'AN • DIGITAL SMART SCHOOL • ADAB ASWAJA
-      </div>
+  {# 2. Floating Portal (8 Layanan) #}
+  {% include "components/portal_cards.html" %}
 
-      <h1 class="hero-title">
-        Mencetak Generasi Qur'ani, <span>Cerdas Teknologi</span> & Berakhlakul Karimah
-      </h1>
+  {# 3. Sambutan Kepala Sekolah #}
+  {% include "components/sambutan_ringkas.html" %}
 
-      <p class="hero-description">
-        Selamat datang di <strong>SMP Islam Walisongo 2 Depok</strong>. Memadukan kurikulum nasional modern, pendidikan karakter Islami, hafalan Al-Qur'an bersanad, dan kecakapan digital abad 21 di bawah naungan <em>Yayasan Pondok Pesantren Hj. Dardjah Amin</em>.
-      </p>
+  {# 4. Banner Counter Statistik #}
+  {% include "components/stats_counter.html" %}
 
-      <div class="hero-actions">
-        <a href="javascript:void(0)" onclick="openModal('modalPpdbRegister')" class="btn-primary-hero">
-          PENDAFTARAN PPDB 2026/2027 ➔
-        </a>
-        <a href="#program" class="btn-secondary-hero">
-          JELAJAHI PROGRAM & FASILITAS
-        </a>
-      </div>
+  {# 5. Program Unggulan Akademik & Tahfidz #}
+  {% include "components/program_unggulan.html" %}
 
-      <div class="hero-features-list">
-        <div class="hero-feature-item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          <span>Akreditasi A Kemendikdasmen</span>
+  {# 6. Ekstrakurikuler Unggulan #}
+  {% include "components/ekskul.html" %}
+
+  {# 7. Berita & Publikasi Terkini #}
+  {% include "components/berita.html" %}
+
+  {# 8. Suara Santri & Testimoni #}
+  {% include "components/testimoni.html" %}
+
+  {# 9. Mitra Kerja Sama #}
+  {% include "components/mitra.html" %}
+
+  {# 10. Peta Interaktif Lokasi Kampus #}
+  {% include "components/lokasi_map.html" %}
+
+  {# 11. Modal Dialogs #}
+  {% include "components/modals.html" %}
+
+  <!-- Leaflet Map JS & Inisialisasi Peta Kampus -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const mapElement = document.getElementById('campusMap');
+    if (mapElement && typeof L !== 'undefined') {
+      const lat = -6.42588;
+      const lng = 106.84073;
+
+      const map = L.map('campusMap', {
+        scrollWheelZoom: false,
+        zoomControl: true
+      }).setView([lat, lng], 16);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: 'Leaflet | &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
+      }).addTo(map);
+
+      const marker = L.marker([lat, lng]).addTo(map);
+      marker.bindPopup(`
+        <div style="font-family: inherit; font-size: 0.85rem; padding: 4px; max-width: 260px;">
+          <strong style="color: #0369a1; font-size: 0.95rem; display:block; margin-bottom: 4px; line-height: 1.3;">Kampus Utama SMP Islam Walisongo 2</strong>
+          <span style="color: #475569; display:block; line-height: 1.4; margin-bottom: 8px;">Komplek Pendidikan Terpadu Jl. Cepit Raya, Kp. Sawah RT 05/02, Jatimulya, Cilodong, Kota Depok</span>
+          <a href="https://www.google.com/maps/search/?api=1&query=SMP+Islam+Walisongo+2+Cilodong+Depok" target="_blank" rel="noopener noreferrer" style="color: #0284c7; font-weight: 700; text-decoration: underline;">Buka di Google Maps ➔</a>
         </div>
-        <div class="hero-feature-item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          <span>Kurikulum Merdeka Terintegrasi</span>
-        </div>
-        <div class="hero-feature-item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          <span>Tahfidz & Sanad Tajwid</span>
-        </div>
-        <div class="hero-feature-item">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          <span>Laboratorium IT & Coding</span>
-        </div>
-      </div>
-    </div>
+      `).openPopup();
 
-    <!-- Right Column: Glowing Hologram Card -->
-    <div>
-      <div class="hero-visual-card">
-        <div class="hero-card-badge">SEKOLAH ISLAM UNGGULAN KOTA DEPOK</div>
-        <img src="/static/images/logo-walisongo.svg" alt="Emblem SMP Islam Walisongo 2" class="hero-emblem-large">
-        <h3 class="hero-card-title">SMP ISLAM WALISONGO 2</h3>
-        <p class="hero-card-subtitle">NPSN: {{ school.npsn }} • Cilodong, Kota Depok</p>
-
-        <div class="hero-quick-stats">
-          <div class="quick-stat-item">
-            <span class="quick-stat-val">A</span>
-            <span class="quick-stat-lbl">Akreditasi</span>
-          </div>
-          <div class="quick-stat-item">
-            <span class="quick-stat-val">100%</span>
-            <span class="quick-stat-lbl">Kelulusan</span>
-          </div>
-          <div class="quick-stat-item">
-            <span class="quick-stat-val">Juz 30+</span>
-            <span class="quick-stat-lbl">Tahfidz</span>
-          </div>
-        </div>
-
-        <div style="margin-top: 1.25rem; width: 100%;">
-          <button onclick="openModal('modalPpdbCheck')" class="btn-mobile-mode" style="width: 100%; justify-content: center; background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.3);">
-            🔍 Lacak Status Registrasi PPDB Siswa
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ==================== FLOATING INTEGRATED PORTAL (8 CARDS) ==================== -->
-<section class="floating-portal-section">
-  <div class="container">
-    <div class="portal-box-wrapper">
-      <div class="portal-header-pill">
-        <span class="portal-badge-label">PORTAL LAYANAN TERPADU</span>
-        <h2 class="portal-main-heading">Akses Cepat Sistem Informasi & Akademik Sekolah</h2>
-      </div>
-
-      <div class="portal-grid">
-        <!-- 1. SIAKAD -->
-        <a href="/portal#siakad" class="portal-card-btn">
-          <div class="portal-icon-wrap">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
-          </div>
-          <span class="portal-title">SIAKAD</span>
-        </a>
-
-        <!-- 2. PPDB Online -->
-        <a href="javascript:void(0)" onclick="openModal('modalPpdbRegister')" class="portal-card-btn">
-          <div class="portal-icon-wrap" style="background:#fef3c7; color:#d97706;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg>
-          </div>
-          <span class="portal-title">PPDB Online</span>
-        </a>
-
-        <!-- 3. E-Learning / CBT -->
-        <a href="/portal#cbt" class="portal-card-btn">
-          <div class="portal-icon-wrap">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-          </div>
-          <span class="portal-title">E-Learning & CBT</span>
-        </a>
-
-        <!-- 4. E-Perpustakaan -->
-        <a href="/portal#perpus" class="portal-card-btn">
-          <div class="portal-icon-wrap">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-          </div>
-          <span class="portal-title">E-Library & Kitab</span>
-        </a>
-
-        <!-- 5. Cek Nilai Raport -->
-        <a href="javascript:void(0)" onclick="openModal('modalRaportCheck')" class="portal-card-btn">
-          <div class="portal-icon-wrap" style="background:#ede9fe; color:#6d28d9;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-          </div>
-          <span class="portal-title">Cek Raport</span>
-        </a>
-
-        <!-- 6. Kalkulator SPP & Beasiswa -->
-        <a href="javascript:void(0)" onclick="openModal('modalKalkulator')" class="portal-card-btn">
-          <div class="portal-icon-wrap" style="background:#fef3c7; color:#b45309;">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="18"></line><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M8 18h.01M12 18h.01"></path></svg>
-          </div>
-          <span class="portal-title">Kalkulator SPP</span>
-        </a>
-
-        <!-- 7. Ekskul & Pramuka BRAVIA -->
-        <a href="#ekskul" class="portal-card-btn">
-          <div class="portal-icon-wrap">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
-          </div>
-          <span class="portal-title">Ekskul BRAVIA</span>
-        </a>
-
-        <!-- 8. Pengaduan & Layanan BK -->
-        <a href="#kontak" class="portal-card-btn">
-          <div class="portal-icon-wrap">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-          </div>
-          <span class="portal-title">Konseling & BK</span>
-        </a>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ==================== SAMBUTAN KEPALA SEKOLAH ==================== -->
-<section id="sambutan" class="section-sambutan">
-  <div class="container sambutan-grid">
-    <!-- Left: Speech text -->
-    <div class="sambutan-content-col">
-      <span class="section-pill-tag">SAMBUTAN KEPALA SEKOLAH</span>
-      <h2 class="section-title">
-        Membimbing Generasi Pemimpin dengan Iman, Adab, dan Teknologi
-      </h2>
-      <p class="sambutan-text">
-        "Alhamdulillah, puji syukur ke hadirat Allah SWT. SMP Islam Walisongo 2 Depok hadir sebagai ikhtiar luhur dalam mendidik putra-putri bangsa agar memiliki keteguhan akidah, keluhuran budi pekerti, serta kesiapan menyongsong era revolusi teknologi.
-        <br><br>
-        Kami meyakini bahwa kecerdasan intelektual harus selalu dibingkai dengan akhlakul karimah dan kecintaan pada Al-Qur'an. Melalui kolaborasi para ustadz dan pendidik profesional, kami berkomitmen mendampingi setiap santri menemukan potensi terbaiknya."
-      </p>
-
-      <div class="kepsek-profile-badge">
-        <img src="/static/images/guru-kepsek.svg" alt="Kepala Sekolah" class="kepsek-thumb">
-        <div>
-          <div class="kepsek-name">{{ school.kepala_sekolah }}</div>
-          <div class="kepsek-role">Kepala Sekolah SMP Islam Walisongo 2 Depok</div>
-        </div>
-      </div>
-
-      <div>
-        <a href="javascript:void(0)" onclick="openModal('modalSambutan')" class="btn-read-more-link">
-          Baca Sambutan Selengkapnya ➔
-        </a>
-      </div>
-    </div>
-
-    <!-- Right: Media Card -->
-    <div class="sambutan-media-col">
-      <div class="sambutan-photo-frame">
-        <img src="/static/images/sambutan-santri.svg" alt="Aktivitas Belajar Santri Walisongo 2" class="sambutan-main-img">
-        <div class="sambutan-float-badge">
-          <div class="float-badge-icon">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polygon points="10 8 16 12 10 16 10 8"></polygon></svg>
-          </div>
-          <div>
-            <div class="float-badge-title">Yayasan PP. Hj. Dardjah Amin</div>
-            <div class="float-badge-sub">Membina generasi Islam sejak dini</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ==================== STATS BANNER COUNTER ==================== -->
-<section class="stats-banner-section">
-  <div class="container stats-grid">
-    <div class="stat-item-box">
-      <div class="stat-num" data-target="A" data-suffix="">A</div>
-      <div class="stat-title">AKREDITASI A (UNGGUL)</div>
-      <div class="stat-desc">Standar Mutu BAN-S/M Kemendikdasmen</div>
-    </div>
-
-    <div class="stat-item-box">
-      <div class="stat-num" data-target="500" data-suffix="+">0</div>
-      <div class="stat-title">SANTRI & ALUMNI</div>
-      <div class="stat-desc">Aktif berkarya di sekolah lanjutan terbaik</div>
-    </div>
-
-    <div class="stat-item-box">
-      <div class="stat-num" data-target="25" data-suffix="+">0</div>
-      <div class="stat-title">ASATIDZ & DEWAN GURU</div>
-      <div class="stat-desc">Pendidik profesional & penghafal Al-Qur'an</div>
-    </div>
-
-    <div class="stat-item-box">
-      <div class="stat-num" data-target="100" data-suffix="%">0</div>
-      <div class="stat-title">KURIKULUM MERDEKA</div>
-      <div class="stat-desc">Integrasi Sains, Tahfidz & Digital 4.0</div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ==================== PROGRAM UNGGULAN ==================== -->
-<section id="program" class="section-programs">
-  <div class="container">
-    <div class="section-header-row">
-      <div class="header-text-block">
-        <span class="section-pill-tag">PILIHAN AKADEMIK & TAHFIDZ</span>
-        <h2 class="section-title">Program Unggulan Pendidikan Berkualitas</h2>
-        <p style="color: #64748b; font-size: 0.95rem;">Kurikulum yang dirancang terpadu guna membekali santri keunggulan spiritual, kognitif, dan kecakapan masa depan.</p>
-      </div>
-      <div>
-        <a href="/profil" class="btn-view-all">LIHAT PROFIL LENGKAP ➔</a>
-      </div>
-    </div>
-
-    <div class="programs-grid">
-      <!-- Card 1 -->
-      <div class="program-card">
-        <div class="program-top-meta">
-          <span class="program-level-tag">Reguler & Khusus</span>
-          <span class="program-badge-status">Prioritas Utama</span>
-        </div>
-        <h3 class="program-name">Tahfidzul Qur'an & Tilawah</h3>
-        <p class="program-summary">
-          Program hafalan Al-Qur'an dengan bimbingan metode talaqqi bersanad, perbaikan makharijul huruf, tajwid mutqin, serta tradisi One Day One Maqra' dan khotmil Qur'an terpadu.
-        </p>
-        <div class="program-card-footer">
-          <span class="link-program-detail" onclick="openModal('modalPpdbRegister')">Daftar Jalur Tahfidz ➔</span>
-        </div>
-      </div>
-
-      <!-- Card 2 -->
-      <div class="program-card">
-        <div class="program-top-meta">
-          <span class="program-level-tag">Digital Smart School</span>
-          <span class="program-badge-status">Inovasi 4.0</span>
-        </div>
-        <h3 class="program-name">Digital IT & Coding Club</h3>
-        <p class="program-summary">
-          Laboratorium komputer modern dengan materi logika koding, pemrograman web dasar, Scratch, desain grafis multimedia, dan pengenalan robotika aplikatif untuk generasi santri cerdas digital.
-        </p>
-        <div class="program-card-footer">
-          <span class="link-program-detail" onclick="openModal('modalPpdbRegister')">Pelajari Fasilitas Lab ➔</span>
-        </div>
-      </div>
-
-      <!-- Card 3 -->
-      <div class="program-card">
-        <div class="program-top-meta">
-          <span class="program-level-tag">Bilingual</span>
-          <span class="program-badge-status">Global Ready</span>
-        </div>
-        <h3 class="program-name">Bilingual Arabic & English</h3>
-        <p class="program-summary">
-          Wadah pengembangan kemampuan public speaking, khitobah (pidato bahasa Arab), English debate, dan pembiasaan percakapan sehari-hari dalam lingkungan pesantren yang suportif.
-        </p>
-        <div class="program-card-footer">
-          <span class="link-program-detail" onclick="openModal('modalPpdbRegister')">Kurikulum Bahasa ➔</span>
-        </div>
-      </div>
-
-      <!-- Card 4 -->
-      <div class="program-card">
-        <div class="program-top-meta">
-          <span class="program-level-tag">Karakter Santri</span>
-          <span class="program-badge-status">Ahlussunnah wal Jama'ah</span>
-        </div>
-        <h3 class="program-name">Adab & Amaliyah Aswaja</h3>
-        <p class="program-summary">
-          Pembiasaan sholat Dhuha serentak, sholat fardhu berjamaah di masjid pesantren Hj. Dardjah Amin, kajian hadits arba'in, kitab akhlaq lil banin/banat, dan penanaman birrul walidain.
-        </p>
-        <div class="program-card-footer">
-          <span class="link-program-detail" onclick="openModal('modalPpdbRegister')">Pembiasaan Ibadah ➔</span>
-        </div>
-      </div>
-
-      <!-- Card 5 -->
-      <div class="program-card">
-        <div class="program-top-meta">
-          <span class="program-level-tag">Kepramukaan</span>
-          <span class="program-badge-status">Tradisi Juara</span>
-        </div>
-        <h3 class="program-name">Pramuka BRAVIA Walisongo</h3>
-        <p class="program-summary">
-          Gugus Depan Penggalang berprestasi Juara Umum Kwarran Cilodong. Melatih ketangkasan pionering, sandi semaphore, survival camp, kemandirian, dan kepemimpinan tangguh.
-        </p>
-        <div class="program-card-footer">
-          <span class="link-program-detail" onclick="openModal('modalPpdbRegister')">Prestasi Pramuka ➔</span>
-        </div>
-      </div>
-
-      <!-- Card 6 -->
-      <div class="program-card">
-        <div class="program-top-meta">
-          <span class="program-level-tag">Sains Terpadu</span>
-          <span class="program-badge-status">Kompetitif</span>
-        </div>
-        <h3 class="program-name">Klinik OSN & Sains Madrasah</h3>
-        <p class="program-summary">
-          Bimbingan intensif bagi siswa berbakat dalam bidang Matematika, IPA, dan IPS Terpadu untuk berkompetisi di ajang Olimpiade Sains Nasional (OSN) dan KSM Kemenag.
-        </p>
-        <div class="program-card-footer">
-          <span class="link-program-detail" onclick="openModal('modalPpdbRegister')">Jalur Prestasi OSN ➔</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ==================== EKSTRAKURIKULER SHOWCASE ==================== -->
-<section id="ekskul" style="padding: 4.5rem 0; background: #ffffff;">
-  <div class="container">
-    <div class="section-header-row">
-      <div class="header-text-block">
-        <span class="section-pill-tag">PENGEMBANGAN MINAT & BAKAT</span>
-        <h2 class="section-title">Ekstrakurikuler Pilihan Santri Berprestasi</h2>
-        <p style="color: #64748b; font-size: 0.95rem;">Menyalurkan bakat dan hobi santri secara positif, terarah, serta menghasilkan prestasi di tingkat kota maupun provinsi.</p>
-      </div>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
-      {% for e in ekskul_list %}
-      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:1.5rem; transition:all 0.25s ease;" onmouseover="this.style.borderColor='#10b981'; this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
-          <span style="background:#ecfdf5; color:#047857; font-size:0.75rem; font-weight:800; padding:0.25rem 0.65rem; border-radius:999px;">{{ e.kategori }}</span>
-          <span style="background:#fef3c7; color:#b45309; font-size:0.75rem; font-weight:700; padding:0.25rem 0.5rem; border-radius:6px;">{{ e.badge }}</span>
-        </div>
-        <h3 style="font-size:1.15rem; font-weight:800; color:#0f172a; margin-bottom:0.5rem;">{{ e.nama }}</h3>
-        <p style="font-size:0.875rem; color:#64748b; line-height:1.6; margin-bottom:1rem;">{{ e.deskripsi }}</p>
-        <div style="border-top:1px dashed #cbd5e1; padding-top:0.75rem; font-size:0.8rem; color:#334155;">
-          <p><strong>Pembina:</strong> {{ e.pembina }}</p>
-          <p><strong>Jadwal:</strong> {{ e.jadwal }}</p>
-          {% if e.prestasi %}
-          <p style="color:#059669; font-weight:700; margin-top:0.25rem;">🏅 {{ e.prestasi }}</p>
-          {% endif %}
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-
-
-<!-- ==================== BERITA & PENGUMUMAN ==================== -->
-<section id="berita" class="section-news">
-  <div class="container">
-    <div class="section-header-row">
-      <div class="header-text-block">
-        <span class="section-pill-tag">PUBLIKASI TERKINI</span>
-        <h2 class="section-title">Berita & Pengumuman Sekolah</h2>
-        <p style="color: #64748b; font-size: 0.95rem;">Informasi resmi, agenda kegiatan kesiswaan, dan catatan prestasi terkini SMP Islam Walisongo 2 Depok.</p>
-      </div>
-      <div>
-        <a href="#berita" class="btn-view-all">LIHAT ARSIP BERITA ➔</a>
-      </div>
-    </div>
-
-    <!-- Filter Buttons -->
-    <div class="news-filter-tabs">
-      <button class="news-tab-btn active" data-filter="all">Semua Informasi</button>
-      <button class="news-tab-btn" data-filter="Pengumuman PPDB">Pengumuman PPDB</button>
-      <button class="news-tab-btn" data-filter="Prestasi Siswa">Prestasi Siswa</button>
-      <button class="news-tab-btn" data-filter="Kegiatan Kesiswaan">Kegiatan Santri</button>
-      <button class="news-tab-btn" data-filter="Inovasi Edukasi">Inovasi Edukasi</button>
-    </div>
-
-    <div class="news-grid">
-      {% for b in berita_list %}
-      <article class="news-card" data-category="{{ b.kategori }}">
-        <div class="news-thumb-wrap">
-          <img src="{{ b.gambar }}" alt="{{ b.judul }}" class="news-img">
-          <span class="news-tag-badge">{{ b.kategori }}</span>
-        </div>
-        <div class="news-content">
-          <span class="news-date">📅 {{ b.tanggal }} • Oleh {{ b.penulis }}</span>
-          <h3 class="news-card-title">{{ b.judul }}</h3>
-          <p class="news-card-excerpt">{{ b.ringkasan }}</p>
-          <div>
-            <span class="news-card-btn" onclick="showArticleModal({{ b.id }})">
-              BACA SELENGKAPNYA ➔
-            </span>
-          </div>
-        </div>
-      </article>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-
-
-<!-- ==================== CERITA DARI SANTRI & WALI MURID ==================== -->
-<section class="section-testimonials">
-  <div class="container">
-    <div class="section-header-row">
-      <div class="header-text-block">
-        <span class="section-pill-tag">SUARA SIVITAS & ALUMNI</span>
-        <h2 class="section-title">Cerita dari Siswa, Wali Murid & Alumni</h2>
-        <p style="color: #64748b; font-size: 0.95rem;">Pengalaman nyata belajar, bertumbuh, menghafal Al-Qur'an, dan meraih prestasi di lingkungan asri SMP Islam Walisongo 2 Depok.</p>
-      </div>
-    </div>
-
-    <div class="testimonials-grid">
-      {% for t in testimoni_list %}
-      <div class="testimonial-card">
-        <div>
-          <div class="quote-icon-mark">“</div>
-          <p class="testimonial-text">{{ t.pesan }}</p>
-        </div>
-        <div class="testimonial-author-meta">
-          <div class="author-avatar-circle">{{ t.avatar_initials }}</div>
-          <div>
-            <div class="author-name">{{ t.nama }}</div>
-            <div class="author-sub">{{ t.status }} • {{ t.angkatan_relasi }}</div>
-          </div>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-  </div>
-</section>
-
-
-<!-- ==================== MITRA KERJA SAMA ==================== -->
-<section class="section-partners">
-  <div class="container">
-    <div class="partners-heading-block">
-      <span class="section-pill-tag">KOLABORASI & SINERGI</span>
-      <h2 class="section-title">Mitra Kerja Sama & Jejaring Lembaga</h2>
-      <p style="color: #64748b; font-size: 0.95rem;">Sinergi kelembagaan yang memperkuat kualitas pembelajaran, pembinaan dakwah, dan kepanduan.</p>
-    </div>
-
-    <div class="partners-grid">
-      <div class="partner-box">
-        <div class="partner-icon-circle">K</div>
-        <div class="partner-name">Kemendikdasmen RI</div>
-        <div class="partner-desc">Pembinaan Kurikulum Merdeka & Akreditasi A</div>
-      </div>
-
-      <div class="partner-box">
-        <div class="partner-icon-circle">M</div>
-        <div class="partner-name">Kemenag Kota Depok</div>
-        <div class="partner-desc">Sinergi Pembinaan PAI & Musabaqah Hifdzil Qur'an</div>
-      </div>
-
-      <div class="partner-box">
-        <div class="partner-icon-circle">P</div>
-        <div class="partner-name">Kwartir Cabang Pramuka</div>
-        <div class="partner-desc">Gugus Depan Penggalang Berprestasi Kwarran Cilodong</div>
-      </div>
-
-      <div class="partner-box">
-        <div class="partner-icon-circle">B</div>
-        <div class="partner-name">Bank Syariah Indonesia (BSI)</div>
-        <div class="partner-desc">Layanan Pembayaran SPP Online & Edukasi Finansial</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ==================== LOKASI KAMPUS & PETA INTERAKTIF ==================== -->
-<section id="kontak" class="campus-location-section">
-  <div class="container" style="max-width: 1240px;">
-    <!-- Header Lokasi Kampus Persis Seperti Gambar 1 -->
-    <div style="margin-bottom: 1.75rem;">
-      <span class="campus-tag-badge">LOKASI KAMPUS</span>
-      <h2 class="campus-section-title">Temukan Kampus SMP Islam Walisongo 2 Depok</h2>
-      <p class="campus-section-desc">Seluruh lokasi aktif ditampilkan dalam satu peta. Klik marker untuk melihat alamat.</p>
-    </div>
-
-    <!-- Info Card Kampus Utama Persis Seperti Gambar 1 -->
-    <div class="campus-info-card">
-      <h3 class="campus-info-card-title">Kampus Utama</h3>
-      <p class="campus-info-card-address">
-        Komplek Pendidikan Terpadu Jl. Cepit Raya, Kp. Sawah RT. 005 / RW. 002, Kelurahan Jatimulya, Kecamatan Cilodong, Kota Depok, Jawa Barat 16413.
-      </p>
-      <a href="https://www.google.com/maps/search/?api=1&query=SMP+Islam+Walisongo+2+Cilodong+Depok" target="_blank" rel="noopener noreferrer" class="campus-maps-link">
-        Google Maps ➔
-      </a>
-    </div>
-
-    <!-- Container Peta Leaflet + OpenStreetMap Persis Seperti Gambar 1 -->
-    <div class="campus-map-wrapper">
-      <div id="campusMap"></div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ==================== MODAL: SAMBUTAN KEPSEK FULL ==================== -->
-<div id="modalSambutan" class="modal-backdrop">
-  <div class="modal-window">
-    <div class="modal-header">
-      <h3 class="modal-header-title">📜 Sambutan Lengkap Kepala Sekolah</h3>
-      <button class="btn-close-modal">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.25rem;">
-        <img src="/static/images/guru-kepsek.svg" alt="Kepsek" style="width:60px; height:60px; border-radius:12px; border:2px solid #f59e0b;">
-        <div>
-          <h4 style="color:#064e3b; font-size:1.1rem; font-weight:800; margin:0;">{{ school.kepala_sekolah }}</h4>
-          <p style="color:#64748b; font-size:0.85rem; margin:0;">Kepala Sekolah SMP Islam Walisongo 2 Depok</p>
-        </div>
-      </div>
-      <div style="font-size:0.95rem; color:#334155; line-height:1.75; display:flex; flex-direction:column; gap:1rem;">
-        <p><em>Assalamu'alaikum Warahmatullahi Wabarakatuh,</em></p>
-        <p>Puji dan syukur senantiasa kita panjatkan ke hadirat Allah SWT, Rabb semesta alam, yang telah menganugerahkan taufiq dan hidayah-Nya. Shalawat beriring salam semoga senantiasa tercurah kepada junjungan kita Nabi Agung Muhammad SAW, keluarga, sahabat, dan para pengikutnya hingga akhir zaman.</p>
-        <p>Sebagai lembaga pendidikan formal yang bernafaskan nilai-nilai Islam Ahlussunnah wal Jama'ah di bawah naungan <strong>Yayasan Pondok Pesantren Hj. Dardjah Amin</strong>, SMP Islam Walisongo 2 Depok mengemban amanah suci untuk melahirkan generasi yang tidak hanya cerdas secara nalar sains, tetapi juga kukuh dalam adab dan akidah.</p>
-        <p>Pendidikan di SMP Islam Walisongo 2 Depok mengintegrasikan <strong>Kurikulum Merdeka</strong> dengan program unggulan Tahfidzul Qur'an, kecakapan berbahasa asing (Arab & Inggris), serta literasi digital modern. Kami mendidik anak-anak kita dengan kasih sayang, keteladanan, dan disiplin tinggi melalui pembiasaan ibadah harian serta kepanduan Pramuka BRAVIA.</p>
-        <p>Kami menyambut hangat para orang tua yang ingin mengamanahkan putra-putrinya untuk tumbuh bersama kami. Mari bersama-sama kita ikhtiarkan generasi terbaik yang akan menjadi kebanggaan keluarga, agama, dan bangsa.</p>
-        <p><em>Wassalamu'alaikum Warahmatullahi Wabarakatuh.</em></p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ==================== MODAL: ARTICLE READER ==================== -->
-<div id="modalArticleReader" class="modal-backdrop">
-  <div class="modal-window">
-    <div class="modal-header">
-      <h3 class="modal-header-title" id="articleModalTitle">Detail Berita</h3>
-      <button class="btn-close-modal">&times;</button>
-    </div>
-    <div class="modal-body" id="articleModalBody">
-      <!-- Injected by showArticleModal -->
-    </div>
-  </div>
-</div>
-
-<script>
-// Contact Form Submission
-async function submitContactForm(e) {
-  e.preventDefault();
-  const payload = {
-    nama: document.getElementById('contactNama').value.trim(),
-    no_whatsapp: document.getElementById('contactWa').value.trim(),
-    email: document.getElementById('contactEmail').value.trim(),
-    kategori: document.getElementById('contactKategori').value,
-    subjek: document.getElementById('contactSubjek').value.trim(),
-    pesan: document.getElementById('contactPesan').value.trim()
-  };
-
-  try {
-    const res = await fetch('/api/kontak', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    const result = await res.json();
-    if (result.status === 'success') {
-      showToast(result.message, 'success');
-      document.getElementById('contactForm').reset();
+      setTimeout(function() {
+        map.invalidateSize();
+      }, 400);
     }
-  } catch (err) {
-    showToast('Terjadi kendala saat mengirim pesan.', 'error');
-  }
-}
-
-// Show Article in Modal
-async function showArticleModal(id) {
-  try {
-    const res = await fetch(`/api/berita/${id}`);
-    const data = await res.json();
-    if (data.status === 'success') {
-      const b = data.data;
-      document.getElementById('articleModalTitle').textContent = b.kategori;
-      document.getElementById('articleModalBody').innerHTML = `
-        <h2 style="font-size:1.4rem; font-weight:800; color:#0f172a; margin-bottom:0.5rem; line-height:1.3;">${b.judul}</h2>
-        <p style="font-size:0.8rem; color:#64748b; margin-bottom:1rem;">📅 Dipublikasikan pada ${b.tanggal} oleh <strong>${b.penulis}</strong></p>
-        <img src="${b.gambar}" style="width:100%; height:240px; object-fit:cover; border-radius:12px; margin-bottom:1.25rem;">
-        <div style="font-size:0.95rem; color:#334155; line-height:1.75; white-space:pre-wrap;">${b.konten}</div>
-      `;
-      openModal('modalArticleReader');
-    }
-  } catch (e) {
-    showToast('Gagal memuat artikel', 'error');
-  }
-}
-</script>
-
-<!-- Leaflet Map JS & Initialization -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const mapElement = document.getElementById('campusMap');
-  if (mapElement && typeof L !== 'undefined') {
-    // Koordinat Kampus SMP Islam Walisongo 2 Cilodong Depok
-    const lat = -6.42588;
-    const lng = 106.84073;
-
-    const map = L.map('campusMap', {
-      scrollWheelZoom: false,
-      zoomControl: true
-    }).setView([lat, lng], 16);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: 'Leaflet | &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-    const marker = L.marker([lat, lng]).addTo(map);
-    marker.bindPopup(`
-      <div style="font-family: inherit; font-size: 0.85rem; padding: 4px; max-width: 260px;">
-        <strong style="color: #0369a1; font-size: 0.95rem; display:block; margin-bottom: 4px; line-height: 1.3;">Kampus Utama SMP Islam Walisongo 2</strong>
-        <span style="color: #475569; display:block; line-height: 1.4; margin-bottom: 8px;">Komplek Pendidikan Terpadu Jl. Cepit Raya, Kp. Sawah RT 05/02, Jatimulya, Cilodong, Kota Depok</span>
-        <a href="https://www.google.com/maps/search/?api=1&query=SMP+Islam+Walisongo+2+Cilodong+Depok" target="_blank" rel="noopener noreferrer" style="color: #0284c7; font-weight: 700; text-decoration: underline;">Buka di Google Maps ➔</a>
-      </div>
-    `).openPopup();
-
-    // Trigger resize saat render selesai
-    setTimeout(function() {
-      map.invalidateSize();
-    }, 400);
-  }
-});
-</script>
+  });
+  </script>
 {% endblock %}
