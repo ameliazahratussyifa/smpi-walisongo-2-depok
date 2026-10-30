@@ -9,6 +9,7 @@ if __name__ == "__main__":
     print("=" * 60)
     print("✨ SMP ISLAM WALISONGO 2 DEPOK - PORTAL WEB & MOBILE ✨")
     print("Membuka server lokal pada http://localhost:8000")
+    print("Halaman Login Admin & Master: http://localhost:8000/login")
     print("Mode Mobile App: http://localhost:8000/mobile")
     print("Portal PPDB Online: http://localhost:8000/ppdb")
     print("Portal Layanan Terpadu: http://localhost:8000/portal")
