@@ -1,0 +1,558 @@
+"""
+SMP ISLAM WALISONGO 2 DEPOK - Official Web & Mobile Application
+Built with FastAPI & Python. Ready for local execution and seamless Vercel deployment.
+"""
+import os
+import sys
+import random
+import time
+from pathlib import Path
+from fastapi import FastAPI, Request, HTTPException, Form
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
+
+# Ensure project root is in sys.path
+BASE_DIR = Path(__file__).resolve().parent.parent
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
+from backend.database import get_db_connection, init_db
+from backend.initial_data import seed_data
+from backend.models import PPDBRegistrationCreate, PesanKontakCreate, RaportCheckRequest, AIQueryRequest
+
+# Initialize Database & Seed data if necessary
+try:
+    init_db()
+    seed_data()
+except Exception as e:
+    print(f"Database init notice: {e}")
+
+app = FastAPI(
+    title="SMP Islam Walisongo 2 Depok - Portal Terpadu",
+    description="Sistem Informasi Sekolah, Portal Layanan Terpadu & PPDB Online SMP Islam Walisongo 2 Depok",
+    version="2.0.0"
+)
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Static & Templates setup
+STATIC_DIR = BASE_DIR / "static"
+TEMPLATES_DIR = BASE_DIR / "templates"
+
+if STATIC_DIR.exists():
+    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
+
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+
+# School Profile Static Metadata
+SCHOOL_INFO = {
+    "nama": "SMP Islam Walisongo 2 Depok",
+    "npsn": "70043562",
+    "akreditasi": "A (Unggul)",
+    "status": "Swasta Berakreditasi A",
+    "yayasan": "Yayasan Pondok Pesantren Hj. Dardjah Amin",
+    "pimpinan_yayasan": "H. Achmad Baidhowi Hamzah / Ust. Imam Awaludin, S.Pd.",
+    "kepala_sekolah": "Aida Suryaningsih, S.Pd.I",
+    "alamat": "Jl. Cepit Raya, Kp. Sawah RT. 005 / RW. 002, Kelurahan Jatimulya, Kecamatan Cilodong, Kota Depok, Jawa Barat 16413",
+    "telepon": "(021) 7782-4356",
+    "whatsapp": "+62 812-9090-4356",
+    "email": "info@smpiwalisongo2depok.sch.id",
+    "jam_operasional": "Senin - Sabtu: 07.00 - 16.00 WIB",
+    "visi": "Terwujudnya peserta didik yang beriman dan bertakwa, cerdas dalam iptek, terampil berkarya, serta berakhlakul karimah berlandaskan nilai-nilai Ahlussunnah wal Jama'ah.",
+    "misi": [
+        "Menanamkan pondasi akidah Islam yang kokoh, adab mulia, dan kecintaan pada Al-Qur'an melalui program Tahfidz intensif.",
+        "Menyelenggarakan proses pembelajaran berkualitas berbasis Kurikulum Merdeka yang adaptif terhadap sains dan teknologi modern.",
+        "Mengembangkan kecakapan literasi digital, penguasaan coding, robotika, serta bahasa asing (Arab & Inggris).",
+        "Membina kedisiplinan, kemandirian, dan jiwa kepemimpinan santri melalui kepanduan Pramuka BRAVIA serta beragam ekstrakurikuler prestasi.",
+        "Menciptakan lingkungan sekolah asri, agamis, ramah anak, dan kolaboratif dengan orang tua serta masyarakat."
+    ],
+    "program_unggulan": [
+        {"title": "Tahfidzul Qur'an & Tilawah Bersanad", "desc": "Bimbingan hafalan Al-Qur'an tematik dengan target minimal 3 Juz disertai sanad makharijul huruf dan tajwid mutqin.", "icon": "quran"},
+        {"title": "Digital Smart School & IT Club", "desc": "Laboratorium komputer mutakhir, pembelajaran coding, robotika dasar, desain digital, dan ujian berbasis CBT.", "icon": "laptop"},
+        {"title": "Bilingual Speech Environment", "desc": "Pembiasaan percakapan dwi bahasa (Bahasa Arab & English) guna menyiapkan santri berdaya saing global.", "icon": "languages"},
+        {"title": "Pramuka BRAVIA & Karakter Santri", "desc": "Gugus Depan berprestasi juara umum yang melatih survival skill, ketangguhan, kedisiplinan, dan jiwa ksatria.", "icon": "compass"},
+        {"title": "Bimbingan Prestasi Sains & Olimpiade", "desc": "Klinik belajar intensif untuk persiapan Kompetisi Sains Madrasah (KSM) dan Olimpiade Sains Nasional (OSN).", "icon": "sparkles"}
+    ],
+    "fasilitas": [
+        "Ruang Kelas Ber-AC & Dilengkapi Multimedia Proyektor",
+        "Masjid & Aula Serbaguna Hj. Dardjah Amin",
+        "Laboratorium Komputer & Digital Smart School",
+        "Laboratorium IPA Terpadu & Eksperimen Sains",
+        "Perpustakaan Digital (E-Library) & Pojok Literasi Santri",
+        "Lapangan Olahraga Terpadu (Futsal, Basket, Voli)",
+        "Studio Hadroh, Seni Musik & Podcast Kreatif Santri",
+        "Kantin Sehat Higienis & Koperasi Sekolah",
+        "UKS Terpadu dengan Tenaga Medis Bersertifikat",
+        "Keamanan CCTV 24 Jam & Lingkungan Asri Terpadu"
+    ]
+}
+
+# ==================== PAGE CONTROLLERS ====================
+
+@app.get("/", response_class=HTMLResponse)
+async def home_page(request: Request):
+    """Main Web Portal with stunning modern UI, responsive for all devices."""
+    conn = get_db_connection()
+    berita_list = conn.execute("SELECT * FROM berita ORDER BY id DESC LIMIT 4").fetchall()
+    guru_list = conn.execute("SELECT * FROM guru ORDER BY urutan ASC LIMIT 6").fetchall()
+    ekskul_list = conn.execute("SELECT * FROM ekskul ORDER BY id ASC").fetchall()
+    testimoni_list = conn.execute("SELECT * FROM testimoni ORDER BY id ASC").fetchall()
+    conn.close()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+        context={
+            "school": SCHOOL_INFO,
+            "berita_list": [dict(b) for b in berita_list],
+            "guru_list": [dict(g) for g in guru_list],
+            "ekskul_list": [dict(e) for e in ekskul_list],
+            "testimoni_list": [dict(t) for t in testimoni_list],
+            "active_page": "beranda"
+        }
+    )
+
+@app.get("/mobile", response_class=HTMLResponse)
+async def mobile_app_view(request: Request):
+    """Dedicated Mobile App Interface / PWA Native Simulation View."""
+    conn = get_db_connection()
+    berita_list = conn.execute("SELECT * FROM berita ORDER BY id DESC LIMIT 5").fetchall()
+    ekskul_list = conn.execute("SELECT * FROM ekskul ORDER BY id ASC LIMIT 6").fetchall()
+    conn.close()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="mobile_app.html",
+        context={
+            "school": SCHOOL_INFO,
+            "berita_list": [dict(b) for b in berita_list],
+            "ekskul_list": [dict(e) for e in ekskul_list],
+            "active_page": "mobile"
+        }
+    )
+
+@app.get("/profil", response_class=HTMLResponse)
+async def profile_page(request: Request):
+    """Detailed School Profile, History, Vision-Mission, Teachers & Facilities."""
+    conn = get_db_connection()
+    guru_list = conn.execute("SELECT * FROM guru ORDER BY urutan ASC").fetchall()
+    conn.close()
+
+    return templates.TemplateResponse(
+        request=request,
+        name="profil.html",
+        context={
+            "school": SCHOOL_INFO,
+            "guru_list": [dict(g) for g in guru_list],
+            "active_page": "profil"
+        }
+    )
+
+@app.get("/ppdb", response_class=HTMLResponse)
+async def ppdb_page(request: Request):
+    """Dedicated PPDB Online Registration, Requirement Guide, and Status Tracking."""
+    return templates.TemplateResponse(
+        request=request,
+        name="ppdb.html",
+        context={
+            "school": SCHOOL_INFO,
+            "active_page": "ppdb"
+        }
+    )
+
+@app.get("/portal", response_class=HTMLResponse)
+async def portal_page(request: Request):
+    """Integrated Portal Services: SIAKAD, CBT, E-Library, Raport Check, SPP Calculator."""
+    return templates.TemplateResponse(
+        request=request,
+        name="portal.html",
+        context={
+            "school": SCHOOL_INFO,
+            "active_page": "portal"
+        }
+    )
+
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_page(request: Request):
+    """Admin CMS Dashboard to view PPDB registrants, incoming contact messages, and quick stats."""
+    return templates.TemplateResponse(
+        request=request,
+        name="admin.html",
+        context={
+            "school": SCHOOL_INFO,
+            "active_page": "admin"
+        }
+    )
+
+
+# ==================== REST API ENDPOINTS ====================
+
+@app.get("/api/info")
+async def api_school_info():
+    """Get complete school profile metadata."""
+    return {"status": "success", "data": SCHOOL_INFO}
+
+@app.get("/api/berita")
+async def api_get_berita(kategori: str = None):
+    """Get news and announcements."""
+    conn = get_db_connection()
+    if kategori and kategori != "Semua":
+        rows = conn.execute("SELECT * FROM berita WHERE kategori = ? ORDER BY id DESC", (kategori,)).fetchall()
+    else:
+        rows = conn.execute("SELECT * FROM berita ORDER BY id DESC").fetchall()
+    conn.close()
+    return {"status": "success", "total": len(rows), "data": [dict(r) for r in rows]}
+
+@app.get("/api/berita/{id_or_slug}")
+async def api_get_berita_detail(id_or_slug: str):
+    """Get single article by ID or slug."""
+    conn = get_db_connection()
+    if id_or_slug.isdigit():
+        row = conn.execute("SELECT * FROM berita WHERE id = ?", (int(id_or_slug),)).fetchone()
+    else:
+        row = conn.execute("SELECT * FROM berita WHERE slug = ?", (id_or_slug,)).fetchone()
+    conn.close()
+    if not row:
+        raise HTTPException(status_code=404, detail="Berita tidak ditemukan")
+    return {"status": "success", "data": dict(row)}
+
+@app.get("/api/guru")
+async def api_get_guru():
+    """Get list of teachers and staff."""
+    conn = get_db_connection()
+    rows = conn.execute("SELECT * FROM guru ORDER BY urutan ASC").fetchall()
+    conn.close()
+    return {"status": "success", "data": [dict(r) for r in rows]}
+
+@app.get("/api/ekskul")
+async def api_get_ekskul():
+    """Get extracurriculars."""
+    conn = get_db_connection()
+    rows = conn.execute("SELECT * FROM ekskul ORDER BY id ASC").fetchall()
+    conn.close()
+    return {"status": "success", "data": [dict(r) for r in rows]}
+
+@app.get("/api/testimoni")
+async def api_get_testimoni():
+    """Get student and parent testimonials."""
+    conn = get_db_connection()
+    rows = conn.execute("SELECT * FROM testimoni ORDER BY id ASC").fetchall()
+    conn.close()
+    return {"status": "success", "data": [dict(r) for r in rows]}
+
+# PPDB Endpoints
+@app.post("/api/ppdb/register")
+async def api_ppdb_register(data: PPDBRegistrationCreate):
+    """Submit a new PPDB Online application."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    # Generate unique registration number
+    random_num = random.randint(100, 999)
+    timestamp_suffix = str(int(time.time()))[-3:]
+    nomor_registrasi = f"REG-2026-WS{timestamp_suffix}{random_num}"
+
+    try:
+        cursor.execute("""
+        INSERT INTO ppdb_pendaftar (
+            nomor_registrasi, nama_lengkap, nisn, nik, jenis_kelamin,
+            tempat_lahir, tanggal_lahir, asal_sekolah, nama_wali,
+            no_wa_wali, alamat_lengkap, jalur_pendaftaran, pilihan_peminatan,
+            status_seleksi, catatan
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            nomor_registrasi,
+            data.nama_lengkap.strip(),
+            data.nisn.strip(),
+            data.nik.strip() if data.nik else "",
+            data.jenis_kelamin,
+            data.tempat_lahir or "",
+            data.tanggal_lahir or "",
+            data.asal_sekolah.strip(),
+            data.nama_wali.strip(),
+            data.no_wa_wali.strip(),
+            data.alamat_lengkap or "",
+            data.jalur_pendaftaran,
+            data.pilihan_peminatan or "Reguler & Tahfidz",
+            "Menunggu Verifikasi Berkas",
+            "Pendaftaran daring berhasil diterima sistem. Silakan simpan nomor registrasi ini."
+        ))
+        conn.commit()
+    except Exception as e:
+        conn.close()
+        raise HTTPException(status_code=400, detail=f"Gagal memproses pendaftaran: {str(e)}")
+
+    # Fetch inserted record
+    row = cursor.execute("SELECT * FROM ppdb_pendaftar WHERE nomor_registrasi = ?", (nomor_registrasi,)).fetchone()
+    conn.close()
+
+    return {
+        "status": "success",
+        "message": "Pendaftaran PPDB berhasil tersimpan!",
+        "nomor_registrasi": nomor_registrasi,
+        "data": dict(row)
+    }
+
+@app.get("/api/ppdb/check/{query}")
+async def api_ppdb_check(query: str):
+    """Check PPDB status by registration number or NISN."""
+    conn = get_db_connection()
+    q = query.strip()
+    row = conn.execute("""
+    SELECT * FROM ppdb_pendaftar 
+    WHERE UPPER(nomor_registrasi) = UPPER(?) OR nisn = ?
+    """, (q, q)).fetchone()
+    conn.close()
+
+    if not row:
+        return {
+            "status": "not_found",
+            "message": f"Data pendaftaran dengan kata kunci '{query}' tidak ditemukan. Pastikan Nomor Registrasi atau NISN sudah sesuai."
+        }
+    return {
+        "status": "success",
+        "data": dict(row)
+    }
+
+@app.get("/api/ppdb/stats")
+async def api_ppdb_stats():
+    """Get summary statistics of PPDB applicants."""
+    conn = get_db_connection()
+    total = conn.execute("SELECT COUNT(*) FROM ppdb_pendaftar").fetchone()[0]
+    diterima = conn.execute("SELECT COUNT(*) FROM ppdb_pendaftar WHERE status_seleksi LIKE '%Diterima%'").fetchone()[0]
+    verifikasi = conn.execute("SELECT COUNT(*) FROM ppdb_pendaftar WHERE status_seleksi LIKE '%Verifikasi%'").fetchone()[0]
+    conn.close()
+
+    return {
+        "status": "success",
+        "total_pendaftar": total,
+        "diterima": diterima,
+        "dalam_proses": verifikasi,
+        "kuota_total": 120,
+        "sisa_kuota": max(0, 120 - diterima)
+    }
+
+# Academic Report / Raport Lookup
+@app.post("/api/raport/check")
+async def api_raport_check(data: RaportCheckRequest):
+    """Check student report & graduation verification by NISN."""
+    conn = get_db_connection()
+    nisn_clean = data.nisn.strip()
+    row = conn.execute("SELECT * FROM siswa_raport WHERE nisn = ?", (nisn_clean,)).fetchone()
+    conn.close()
+
+    if not row:
+        return {
+            "status": "not_found",
+            "message": f"Data NISN '{data.nisn}' tidak ditemukan. Anda dapat mencoba NISN contoh: 0091234567 atau 0089876543."
+        }
+    return {
+        "status": "success",
+        "data": dict(row)
+    }
+
+# Contact & Consultation
+@app.post("/api/kontak")
+async def api_kirim_pesan(data: PesanKontakCreate):
+    """Submit contact or consultation form."""
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+    INSERT INTO pesan_kontak (nama, email, no_whatsapp, kategori, subjek, pesan)
+    VALUES (?, ?, ?, ?, ?, ?)
+    """, (
+        data.nama.strip(),
+        data.email.strip() if data.email else "",
+        data.no_whatsapp.strip(),
+        data.kategori,
+        data.subjek.strip(),
+        data.pesan.strip()
+    ))
+    conn.commit()
+    conn.close()
+    return {
+        "status": "success",
+        "message": "Pesan Anda telah berhasil dikirim ke Humas SMP Islam Walisongo 2 Depok. Tim kami akan segera merespons via WhatsApp."
+    }
+
+# AI Smart Assistant Chatbot
+@app.post("/api/ai/ask")
+async def api_ai_ask(query: AIQueryRequest):
+    """
+    Intelligent Assistant for SMP Islam Walisongo 2 Depok.
+    Answers prospective parents and students based on verified institutional knowledge.
+    """
+    q = query.pertanyaan.lower().strip()
+
+    # Knowledge response logic
+    if any(k in q for k in ["biaya", "spp", "uang", "bayar", "tarif", "beasiswa", "pembayaran"]):
+        answer = (
+            "Assalamu'alaikum Warahmatullahi Wabarakatuh. ✨\n\n"
+            "Informasi Pembiayaan di SMP Islam Walisongo 2 Depok (Tahun Ajaran 2026/2027):\n"
+            "• Formulir Pendaftaran Online: GRATIS (Rp 0,-\n"
+            "• Uang Pangkal / Sarana Prasarana: Rp 3.500.000 (Dapat dicicil hingga 3x)\n"
+            "• SPP Bulanan: Rp 350.000 / bulan (Sudah termasuk program Tahfidz harian & akses Lab IT)\n"
+            "• Seragam Lengkap (5 Stel Termasuk Seragam Pramuka BRAVIA & Olahraga): Rp 950.000\n\n"
+            "⭐ PROGRAM BEASISWA KHUSUS:\n"
+            "1. Beasiswa Tahfidz: Bebas Uang Pangkal 100% untuk penghafal minimal 2 Juz Al-Qur'an.\n"
+            "2. Beasiswa Prestasi Juara OSN/Lomba Tingkat Kota: Potongan SPP 50% selama 1 tahun.\n\n"
+            "Ayah/Bunda dapat melakukan pendaftaran langsung melalui menu PPDB Online di website ini!"
+        )
+    elif any(k in q for k in ["syarat", "persyaratan", "berkas", "dokumen", "daftar"]):
+        answer = (
+            "Syarat Pendaftaran PPDB SMP Islam Walisongo 2 Depok:\n\n"
+            "1. Mengisi formulir pendaftaran daring di menu PPDB Online.\n"
+            "2. Fotokopi Ijazah / Surat Keterangan Lulus (SKL) SD/MI yang telah dilegalisir (2 lembar).\n"
+            "3. Fotokopi Akta Kelahiran calon peserta didik (2 lembar).\n"
+            "4. Fotokopi Kartu Keluarga (KK) & KTP Orang Tua / Wali (2 lembar).\n"
+            "5. Pas foto formal terbaru ukuran 3x4 berwarna (3 lembar, latar merah/biru).\n"
+            "6. Fotokopi Sertifikat Prestasi / Piagam Hafalan Tahfidz (Bagi jalur beasiswa/prestasi).\n\n"
+            "Semua berkas dapat diunggah secara digital saat pengisian formulir atau diserahkan langsung saat wawancara."
+        )
+    elif any(k in q for k in ["tahfidz", "quran", "qur'an", "hafalan", "khotmil"]):
+        answer = (
+            "Program Tahfidzul Qur'an di SMP Islam Walisongo 2 Depok:\n\n"
+            "• Target Lulusan: Minimal hafal Juz 30 dan Juz pilihan (Juz 1, 29, Surah Al-Kahfi, Yasin, Al-Mulk, Ar-Rahman, Al-Waqiah).\n"
+            "• Metode: Talaqqi dan Musyafahah langsung dibimbing Asatidz Al-Hafidz bersanad.\n"
+            "• Jam Pembiasaan: Setiap pagi sebelum KBM reguler dimulai (One Day One Maqra') dan muroja'ah ba'da dzuhur/ashar.\n"
+            "• Khotmil Qur'an Tematik: Diadakan berkala bersama Yayasan Pondok Pesantren Hj. Dardjah Amin."
+        )
+    elif any(k in q for k in ["alamat", "lokasi", "tempat", "dimana", "daerah"]):
+        answer = (
+            f"📍 Lokasi Kampus SMP Islam Walisongo 2 Depok:\n\n"
+            f"{SCHOOL_INFO['alamat']}\n"
+            f"Patokan: Dekat Jl. Raya Bogor KM 35 Cilodong & kawasan Jatimulya Kp. Sawah Depok.\n"
+            f"Hotline WhatsApp: {SCHOOL_INFO['whatsapp']}\n\n"
+            f"Kami mengundang Bapak/Ibu untuk berkunjung langsung melihat fasilitas laboratorium komputer, aula, masjid pesantren, dan lingkungan belajar kami."
+        )
+    elif any(k in q for k in ["ekskul", "ekstrakurikuler", "pramuka", "bravia", "kegiatan", "robotik", "coding"]):
+        answer = (
+            "Ekstrakurikuler Unggulan di SMP Islam Walisongo 2 Depok:\n\n"
+            "1. Pramuka BRAVIA (Barisan Pramuka Walisongo 2) - Juara Umum LT Kwarran Cilodong.\n"
+            "2. IT Club & Robotika (Belajar Coding Web, Logic Scratch, Perakitan Microcontroller).\n"
+            "3. Hadroh & Marawis El-Walisongo (Seni Musik Rebana Islami).\n"
+            "4. Tahfidz & Tilawah Maqamat (Seni Baca Al-Qur'an).\n"
+            "5. Silat Prestasi IPSI (Pencak Silat Tradisional & Prestasi).\n"
+            "6. English & Arabic Speech Club (Public Speaking dua bahasa).\n"
+            "7. Futsal & Basket Walisongo Warrior.\n"
+            "8. PMR (Palang Merah Remaja) & Paskibraka Sekolah."
+        )
+    elif any(k in q for k in ["kurikulum", "belajar", "merdeka", "pelajaran"]):
+        answer = (
+            "Kurikulum Pendidikan SMP Islam Walisongo 2 Depok:\n\n"
+            "Sekolah kami mengimplementasikan KURIKULUM MERDEKA yang disempurnakan dengan Integrasi Nilai Islam Aswaja (Ahlussunnah wal Jama'ah):\n"
+            "• Mata Pelajaran Umum Nasional: Matematika, IPA Terpadu, Bahasa Indonesia, Bahasa Inggris, IPS, Informatika/Koding, PPKn, PJOK.\n"
+            "• Keagamaan Mendalam: Pendidikan Agama Islam, Fiqih, Aqidah Akhlak, Sejarah Kebudayaan Islam, Bahasa Arab, dan Tahfidz Qur'an.\n"
+            "• Project P5 (Projek Penguatan Profil Pelajar Pancasila): Mengusung tema Kewirausahaan Digital Santri dan Kearifan Lokal."
+        )
+    elif any(k in q for k in ["halo", "hai", "assalamu", "selamat"]):
+        answer = (
+            "Assalamu'alaikum Warahmatullahi Wabarakatuh! Selamat datang di Layanan Informasi Cerdas SMP Islam Walisongo 2 Depok. 😊\n\n"
+            "Saya Asisten Virtual Sekolah siap membantu Anda. Anda dapat menanyakan tentang:\n"
+            "1. Informasi PPDB Online & Kuota Pendaftaran 2026/2027\n"
+            "2. Rincian Biaya SPP & Beasiswa Tahfidz\n"
+            "3. Syarat dan Alur Pendaftaran Siswa Baru\n"
+            "4. Program Ekstrakurikuler & Prestasi Pramuka BRAVIA\n"
+            "5. Alamat & Kontak Resmi Panitia\n\n"
+            "Ada hal spesifik yang ingin Anda ketahui?"
+        )
+    else:
+        answer = (
+            f"Terima kasih atas pertanyaan Anda mengenai SMP Islam Walisongo 2 Depok.\n\n"
+            f"Untuk informasi lebih terperinci mengenai '{query.pertanyaan}', silakan hubungi tim Humas & Panitia PPDB kami langsung melalui WhatsApp di {SCHOOL_INFO['whatsapp']} atau telepon di {SCHOOL_INFO['telepon']}. "
+            f"Anda juga dapat mengisi formulir pesan pada menu Kontak kami!"
+        )
+
+    return {
+        "status": "success",
+        "pertanyaan": query.pertanyaan,
+        "jawaban": answer
+    }
+
+# Admin CMS Endpoints
+@app.get("/api/admin/overview")
+async def api_admin_overview():
+    """Get high-level summary for Admin CMS."""
+    conn = get_db_connection()
+    total_ppdb = conn.execute("SELECT COUNT(*) FROM ppdb_pendaftar").fetchone()[0]
+    total_berita = conn.execute("SELECT COUNT(*) FROM berita").fetchone()[0]
+    total_guru = conn.execute("SELECT COUNT(*) FROM guru").fetchone()[0]
+    total_pesan = conn.execute("SELECT COUNT(*) FROM pesan_kontak").fetchone()[0]
+    pesan_baru = conn.execute("SELECT COUNT(*) FROM pesan_kontak WHERE status = 'Belum Dibaca'").fetchone()[0]
+
+    recent_ppdb = conn.execute("SELECT * FROM ppdb_pendaftar ORDER BY id DESC LIMIT 5").fetchall()
+    recent_pesan = conn.execute("SELECT * FROM pesan_kontak ORDER BY id DESC LIMIT 5").fetchall()
+    conn.close()
+
+    return {
+        "status": "success",
+        "stats": {
+            "total_ppdb": total_ppdb,
+            "total_berita": total_berita,
+            "total_guru": total_guru,
+            "total_pesan": total_pesan,
+            "pesan_baru": pesan_baru
+        },
+        "recent_ppdb": [dict(r) for r in recent_ppdb],
+        "recent_pesan": [dict(p) for p in recent_pesan]
+    }
+
+@app.get("/api/admin/ppdb-all")
+async def api_admin_ppdb_all():
+    """Fetch all PPDB applicants for admin view."""
+    conn = get_db_connection()
+    rows = conn.execute("SELECT * FROM ppdb_pendaftar ORDER BY id DESC").fetchall()
+    conn.close()
+    return {"status": "success", "data": [dict(r) for r in rows]}
+
+@app.post("/api/admin/ppdb-update-status")
+async def api_admin_ppdb_update(
+    id: int = Form(...),
+    status: str = Form(...),
+    catatan: str = Form("")
+):
+    """Update selection status of a PPDB applicant."""
+    conn = get_db_connection()
+    conn.execute("""
+    UPDATE ppdb_pendaftar 
+    SET status_seleksi = ?, catatan = ? 
+    WHERE id = ?
+    """, (status, catatan, id))
+    conn.commit()
+    conn.close()
+    return {"status": "success", "message": "Status calon siswa berhasil diperbarui"}
+
+# PWA Manifest & Service Worker
+@app.get("/manifest.json")
+async def get_manifest():
+    manifest_path = STATIC_DIR / "manifest.json"
+    if manifest_path.exists():
+        return FileResponse(manifest_path, media_type="application/manifest+json")
+    return JSONResponse({
+        "name": "SMP Islam Walisongo 2 Depok",
+        "short_name": "SMPI Walisongo 2",
+        "start_url": "/mobile",
+        "display": "standalone",
+        "background_color": "#064e3b",
+        "theme_color": "#064e3b"
+    })
+
+@app.get("/sw.js")
+async def get_service_worker():
+    sw_path = STATIC_DIR / "sw.js"
+    if sw_path.exists():
+        return FileResponse(sw_path, media_type="application/javascript")
+    return HTMLResponse("/* Service Worker */", media_type="application/javascript")
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("api.index:app", host="0.0.0.0", port=8000, reload=True)

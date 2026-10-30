@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}{{ school.nama }} - Beriman, Cerdas, dan Berakhlakul Karimah{% endblock %}</title>
+  <meta name="description" content="Website Resmi {{ school.nama }}. Sekolah Menengah Pertama Islam Berakreditasi A di Cilodong Depok, naungan Yayasan Pondok Pesantren Hj. Dardjah Amin. PPDB Online 2026/2027.">
+  <meta name="theme-color" content="#064e3b">
+
+  <!-- Favicon & PWA -->
+  <link rel="icon" type="image/svg+xml" href="/static/images/logo-walisongo.svg">
+  <link rel="apple-touch-icon" href="/static/images/logo-walisongo.svg">
+  <link rel="manifest" href="/manifest.json">
+
+  <!-- Core Stylesheet -->
+  <link rel="stylesheet" href="/static/css/style.css">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="container topbar-wrapper">
+      <div class="topbar-contact">
+        <span class="topbar-item">
+          📞 <strong>{{ school.telepon }}</strong>
+        </span>
+        <span class="topbar-item">
+          💬 WA: <strong>{{ school.whatsapp }}</strong>
+        </span>
+        <span class="topbar-item" style="display: none; @media(min-width: 900px){display:flex;}">
+          ✉️ {{ school.email }}
+        </span>
+      </div>
+
+      <div class="topbar-actions">
+        <span class="topbar-badge">
+          🛡️ NPSN: {{ school.npsn }} • Akreditasi {{ school.akreditasi }}
+        </span>
+        <a href="/admin" class="topbar-link" title="Akses CMS Manajemen Sekolah">
+          🔐 Portal Admin CMS
+        </a>
+        <button onclick="openMobileSimulator()" class="btn-mobile-mode" style="padding: 0.15rem 0.6rem; font-size: 0.75rem;">
+          📱 Tampilan Mobile App
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN NAVIGATION -->
+  <nav class="main-nav">
+    <div class="container nav-container">
+      <a href="/" class="brand-logo" title="Beranda SMP Islam Walisongo 2 Depok">
+        <img src="/static/images/logo-walisongo.svg" alt="Logo SMP Islam Walisongo 2 Depok" class="brand-emblem">
+        <div class="brand-text">
+          <span class="brand-name">SMP ISLAM WALISONGO 2</span>
+          <span class="brand-tagline">Cilodong • Kota Depok</span>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Items -->
+      <ul class="nav-menu">
+        <li class="nav-item">
+          <a href="/" class="nav-link {% if active_page == 'beranda' %}active{% endif %}">Beranda</a>
+        </li>
+        <li class="nav-item nav-item-dropdown">
+          <a href="/profil" class="nav-link {% if active_page == 'profil' %}active{% endif %}">
+            Profil ▾
+          </a>
+          <ul class="dropdown-menu">
+            <li class="dropdown-item"><a href="/profil#sambutan">Sambutan Kepala Sekolah</a></li>
+            <li class="dropdown-item"><a href="/profil#sejarah">Sejarah & Yayasan</a></li>
+            <li class="dropdown-item"><a href="/profil#visimisi">Visi & Misi</a></li>
+            <li class="dropdown-item"><a href="/profil#guru">Dewan Asatidz & Guru</a></li>
+            <li class="dropdown-item"><a href="/profil#fasilitas">Sarana & Fasilitas</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a href="/#program" class="nav-link">Program Unggulan</a>
+        </li>
+        <li class="nav-item">
+          <a href="/#ekskul" class="nav-link">Ekstrakurikuler</a>
+        </li>
+        <li class="nav-item">
+          <a href="/#berita" class="nav-link">Berita & Agenda</a>
+        </li>
+        <li class="nav-item">
+          <a href="/portal" class="nav-link {% if active_page == 'portal' %}active{% endif %}">Portal Terpadu</a>
+        </li>
+        <li class="nav-item">
+          <a href="/#kontak" class="nav-link">Kontak</a>
+        </li>
+      </ul>
+
+      <!-- Nav Action Button -->
+      <div class="nav-actions">
+        <a href="/ppdb" class="btn-cta-ppdb">
+          DAFTAR PPDB 2026 ➔
+        </a>
+        <button class="btn-menu-toggle" aria-label="Toggle Menu Navigation">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- CONTENT BODY -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <!-- Col 1: Identity -->
+      <div class="footer-brand-col">
+        <div class="brand-logo">
+          <img src="/static/images/logo-walisongo.svg" alt="Logo" class="brand-emblem" style="width: 48px; height: 48px;">
+          <div class="brand-text">
+            <span class="brand-name" style="font-size: 1rem;">SMP ISLAM WALISONGO 2</span>
+            <span class="brand-tagline" style="color: var(--gold-400);">Yayasan PP. Hj. Dardjah Amin</span>
+          </div>
+        </div>
+        <p class="footer-desc">
+          Mencetak insan terpelajar berakhlakul karimah, unggul dalam sains teknologi dan mendalam dalam pemahaman Al-Qur'an serta ajaran Islam Ahlussunnah wal Jama'ah.
+        </p>
+        <div class="footer-npsn-badge">
+          ✅ NPSN: {{ school.npsn }} | Terakreditasi A (Unggul)
+        </div>
+      </div>
+
+      <!-- Col 2: Quick Links -->
+      <div>
+        <h4 class="footer-col-title">Tautan Cepat</h4>
+        <ul class="footer-links-list">
+          <li><a href="/ppdb">Pendaftaran PPDB 2026/2027</a></li>
+          <li><a href="javascript:void(0)" onclick="openModal('modalPpdbCheck')">Cek Status Penerimaan PPDB</a></li>
+          <li><a href="javascript:void(0)" onclick="openModal('modalRaportCheck')">Verifikasi Raport & Kelulusan</a></li>
+          <li><a href="javascript:void(0)" onclick="openModal('modalKalkulator')">Simulasi Biaya SPP & Beasiswa</a></li>
+          <li><a href="/portal">SIAKAD & CBT Ujian Online</a></li>
+          <li><a href="/profil#guru">Direktori Dewan Guru</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Programs -->
+      <div>
+        <h4 class="footer-col-title">Program Pendidikan</h4>
+        <ul class="footer-links-list">
+          <li><a href="/#program">Tahfidzul Qur'an Bersanad</a></li>
+          <li><a href="/#program">Digital Smart School & Coding</a></li>
+          <li><a href="/#program">Bilingual Arabic & English</a></li>
+          <li><a href="/#ekskul">Pramuka BRAVIA Walisongo 2</a></li>
+          <li><a href="/#ekskul">Hadroh & Marawis El-Walisongo</a></li>
+          <li><a href="/#program">Bimbingan Sains & Olimpiade</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Contact & Location -->
+      <div>
+        <h4 class="footer-col-title">Sekretariat & Lokasi</h4>
+        <div class="footer-contact-item">
+          <span>📍</span>
+          <span>{{ school.alamat }}</span>
+        </div>
+        <div class="footer-contact-item">
+          <span>📞</span>
+          <span>{{ school.telepon }} / {{ school.whatsapp }}</span>
+        </div>
+        <div class="footer-contact-item">
+          <span>🕒</span>
+          <span>{{ school.jam_operasional }}</span>
+        </div>
+        <div class="footer-contact-item">
+          <span>✉️</span>
+          <span>{{ school.email }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="container footer-bottom-bar">
+      <div>
+        © 2026 <strong>SMP Islam Walisongo 2 Depok</strong>. Hak Cipta Dilindungi Undang-Undang.
+      </div>
+      <div>
+        Yayasan Pondok Pesantren Hj. Dardjah Amin • Kota Depok, Jawa Barat
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== WALISONGO AI ASSISTANT WIDGET ==================== -->
+  <div class="ai-assistant-widget">
+    <!-- Chat Window -->
+    <div id="aiChatBox" class="ai-chat-box">
+      <div class="ai-chat-header">
+        <div class="ai-header-profile">
+          <img src="/static/images/logo-walisongo.svg" alt="AI Avatar" class="ai-avatar">
+          <div>
+            <div class="ai-title">Walisongo AI Smart Assistant</div>
+            <div class="ai-sub">Online • Siap Menjawab 24/7</div>
+          </div>
+        </div>
+        <button id="btnCloseAi" class="btn-close-ai" title="Tutup Chat">✕</button>
+      </div>
+
+      <!-- Quick prompts -->
+      <div style="padding: 0.65rem 0.85rem; background: #ecfdf5; border-bottom: 1px solid #d1fae5; display: flex; gap: 0.4rem; overflow-x: auto;">
+        <button class="ai-chip-prompt" data-prompt="Berapa biaya SPP dan uang pangkal sekolah?" style="background:#fff; border:1px solid #10b981; color:#064e3b; font-size:0.7rem; font-weight:700; padding:0.25rem 0.55rem; border-radius:999px; cursor:pointer; white-space:nowrap;">💰 Biaya & SPP</button>
+        <button class="ai-chip-prompt" data-prompt="Apa saja syarat pendaftaran PPDB 2026?" style="background:#fff; border:1px solid #10b981; color:#064e3b; font-size:0.7rem; font-weight:700; padding:0.25rem 0.55rem; border-radius:999px; cursor:pointer; white-space:nowrap;">📝 Syarat PPDB</button>
+        <button class="ai-chip-prompt" data-prompt="Bagaimana program Tahfidz Al-Qur'an?" style="background:#fff; border:1px solid #10b981; color:#064e3b; font-size:0.7rem; font-weight:700; padding:0.25rem 0.55rem; border-radius:999px; cursor:pointer; white-space:nowrap;">📖 Program Tahfidz</button>
+        <button class="ai-chip-prompt" data-prompt="Dimana alamat lengkap sekolah?" style="background:#fff; border:1px solid #10b981; color:#064e3b; font-size:0.7rem; font-weight:700; padding:0.25rem 0.55rem; border-radius:999px; cursor:pointer; white-space:nowrap;">📍 Alamat & Lokasi</button>
+      </div>
+
+      <!-- Messages list -->
+      <div id="aiMessagesList" class="ai-messages-list">
+        <div class="ai-msg bot">
+Assalamu'alaikum Warahmatullahi Wabarakatuh! ✨
+
+Selamat datang di Layanan Informasi Cerdas **SMP Islam Walisongo 2 Depok**. Saya asisten digital siap membantu menjawab pertanyaan seputar pendaftaran PPDB 2026/2027, program tahfidz, biaya sekolah, kurikulum, dan fasilitas santri. Silakan tanyakan apa saja!
+        </div>
+      </div>
+
+      <!-- Input bar -->
+      <div class="ai-chat-input-bar">
+        <input type="text" id="aiChatInput" class="ai-chat-input" placeholder="Tulis pertanyaan seputar sekolah..." autocomplete="off">
+        <button id="btnAiSend" class="btn-ai-send" title="Kirim">
+          ➤
+        </button>
+      </div>
+    </div>
+
+    <!-- Floating Trigger Button -->
+    <button id="aiChatTriggerBtn" class="ai-trigger-btn" title="Tanya Asisten AI Sekolah">
+      <span style="font-size: 1.6rem;">💬</span>
+    </button>
+  </div>
+
+  <!-- ==================== MODAL: PPDB REGISTRATION WIZARD ==================== -->
+  <div id="modalPpdbRegister" class="modal-backdrop">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-header-title">📝 Formulir Pendaftaran PPDB 2026/2027</h3>
+        <button class="btn-close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.25rem;">
+          Lengkapi data calon peserta didik baru. Formulir online ini bebas biaya pendaftaran (Gratis).
+        </p>
+
+        <form id="ppdbRegisterForm">
+          <div class="form-group">
+            <label class="form-label">Nama Lengkap Siswa *</label>
+            <input type="text" name="nama_lengkap" class="form-input" placeholder="Contoh: Muhammad Farhan Pratama" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label">NISN (10 Digit Angka) *</label>
+              <input type="text" name="nisn" maxlength="10" class="form-input" placeholder="Contoh: 0098765432" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Jenis Kelamin *</label>
+              <select name="jenis_kelamin" class="form-select" required>
+                <option value="Laki-laki">Laki-laki</option>
+                <option value="Perempuan">Perempuan</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label">Tempat Lahir</label>
+              <input type="text" name="tempat_lahir" class="form-input" placeholder="Kota Kelahiran">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tanggal Lahir</label>
+              <input type="date" name="tanggal_lahir" class="form-input">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Asal Sekolah (SD / MI) *</label>
+            <input type="text" name="asal_sekolah" class="form-input" placeholder="Contoh: SDIT Al-Barkah / MI Nurul Falah Depok" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label">Nama Orang Tua / Wali *</label>
+              <input type="text" name="nama_wali" class="form-input" placeholder="Nama Lengkap Ayah/Ibu/Wali" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Nomor WhatsApp Aktif *</label>
+              <input type="tel" name="no_wa_wali" class="form-input" placeholder="Contoh: 081234567890" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label">Jalur Pendaftaran *</label>
+              <select name="jalur_pendaftaran" class="form-select" required>
+                <option value="Jalur Reguler">Jalur Reguler</option>
+                <option value="Jalur Beasiswa Tahfidz">Jalur Beasiswa Tahfidz (Min. 2 Juz)</option>
+                <option value="Jalur Prestasi Akademik/Non-Akademik">Jalur Prestasi (Sains/Olahraga/Seni)</option>
+                <option value="Jalur Afirmasi / Yatim Dhuafa">Jalur Afirmasi Yatim / Dhuafa</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Peminatan Kelas</label>
+              <select name="pilihan_peminatan" class="form-select">
+                <option value="Kelas Tahfidz & IT">Kelas Tahfidz & IT Coding</option>
+                <option value="Kelas Bilingual & Sains">Kelas Bilingual (Arab-Inggris) & Sains</option>
+                <option value="Kelas Reguler Plus">Kelas Reguler Berkarakter</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Alamat Lengkap Tempat Tinggal</label>
+            <textarea name="alamat_lengkap" rows="2" class="form-textarea" placeholder="Alamat jalan, RT/RW, Kelurahan, Kecamatan, Kota"></textarea>
+          </div>
+
+          <button type="submit" class="btn-primary-hero" style="width: 100%; justify-content: center; margin-top: 0.5rem; padding: 0.75rem;">
+            Kirim Pendaftaran Sekarang ➔
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: BUKTI SUKSES PPDB ==================== -->
+  <div id="modalPpdbSuccess" class="modal-backdrop">
+    <div class="modal-window" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 class="modal-header-title">🎉 Pendaftaran Berhasil!</h3>
+        <button class="btn-close-modal">&times;</button>
+      </div>
+      <div class="modal-body" id="ppdbSuccessContent">
+        <!-- Rendered by ppdb.js -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: CEK STATUS PPDB ==================== -->
+  <div id="modalPpdbCheck" class="modal-backdrop">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-header-title">🔍 Cek Status Penerimaan PPDB</h3>
+        <button class="btn-close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.875rem; color: #64748b; margin-bottom: 1rem;">
+          Masukkan <strong>Nomor Registrasi</strong> (contoh: <code>REG-2026-WS001</code>) atau <strong>10 Digit NISN</strong> calon siswa untuk melacak progres verifikasi pendaftaran.
+        </p>
+
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+          <input type="text" id="inputTrackQuery" class="form-input" placeholder="Ketik No. Registrasi atau NISN..." value="REG-2026-WS001">
+          <button id="btnCheckPpdbStatus" class="btn-primary-hero" style="font-size: 0.85rem; padding: 0.6rem 1.25rem; white-space: nowrap;">
+            Lacak Data
+          </button>
+        </div>
+
+        <div id="ppdbTrackResult"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: CEK RAPORT & KELULUSAN ==================== -->
+  <div id="modalRaportCheck" class="modal-backdrop">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-header-title">📊 Verifikasi Raport & Kelulusan Siswa</h3>
+        <button class="btn-close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.875rem; color: #64748b; margin-bottom: 1rem;">
+          Layanan verifikasi digital nilai akademik, capaian tahfidzul Qur'an, dan surat keterangan lulus siswa SMP Islam Walisongo 2 Depok.
+        </p>
+
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+          <input type="text" id="raportNisnInput" class="form-input" placeholder="Masukkan 10 digit NISN siswa..." value="0091234567">
+          <button onclick="checkRaportSiswa()" class="btn-primary-hero" style="font-size: 0.85rem; padding: 0.6rem 1.25rem; white-space: nowrap;">
+            Periksa Nilai
+          </button>
+        </div>
+        <p style="font-size: 0.75rem; color: #047857;">💡 Contoh NISN Uji Coba: <code>0091234567</code> (Rizky Pratama) atau <code>0089876543</code> (Aisyah Azzahra)</p>
+
+        <div id="raportResultBox"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: SIMULASI BIAYA SPP ==================== -->
+  <div id="modalKalkulator" class="modal-backdrop">
+    <div class="modal-window">
+      <div class="modal-header">
+        <h3 class="modal-header-title">🧮 Kalkulator Transparan Biaya & SPP</h3>
+        <button class="btn-close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.25rem;">
+          Hitung estimasi rincian biaya masuk dan potongan beasiswa pendidikan di SMP Islam Walisongo 2 Depok:
+        </p>
+
+        <div style="background: #f8fafc; border-radius: 12px; padding: 1rem; margin-bottom: 1.25rem;">
+          <div style="margin-bottom: 0.75rem;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 700; color: #064e3b; cursor: pointer;">
+              <input type="checkbox" id="calcTahfidz" onchange="calculateTuition()">
+              ⭐ Calon Santri Hafal Minimal 2 Juz Al-Qur'an (Bebas Uang Pangkal 100%)
+            </label>
+          </div>
+          <div style="margin-bottom: 0.75rem;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 700; color: #064e3b; cursor: pointer;">
+              <input type="checkbox" id="calcPrestasi" onchange="calculateTuition()">
+              🏆 Jalur Prestasi Juara OSN / Kejuaraan Tingkat Kota (Diskon Uang Pangkal 1 Juta + Diskon SPP)
+            </label>
+          </div>
+          <div>
+            <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 700; color: #064e3b; cursor: pointer;">
+              <input type="checkbox" id="calcSibling" onchange="calculateTuition()">
+              👨‍👩‍👦 Memiliki Saudara Kandung yang Bersekolah di Walisongo 2 (Diskon Khusus SPP)
+            </label>
+          </div>
+        </div>
+
+        <div id="calcResultBox">
+          <script>setTimeout(calculateTuition, 100);</script>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== DESKTOP SMARTPHONE SIMULATOR OVERLAY ==================== -->
+  <div id="mobileSimulatorOverlay" class="mobile-simulator-overlay">
+    <button onclick="closeMobileSimulator()" class="btn-close-simulator">
+      ✕ Tutup Simulasi
+    </button>
+    <div class="phone-mockup-frame">
+      <iframe src="/mobile" class="phone-screen-iframe" title="Tampilan Aplikasi Mobile"></iframe>
+    </div>
+  </div>
+
+  <!-- Core Scripts -->
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/ppdb.js"></script>
+  <script src="/static/js/chat-ai.js"></script>
+  <script src="/static/js/mobile-mode.js"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

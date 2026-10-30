@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Portal Layanan Terpadu - {{ school.nama }}{% endblock %}
+
+{% block content %}
+<section style="background: linear-gradient(135deg, #022c22 0%, #064e3b 100%); color: #ffffff; padding: 4rem 0 3rem 0; text-align: center;">
+  <div class="container" style="max-width: 800px;">
+    <span class="hero-pill-badge">PUSAT INFORMASI & DIGITAL TERPADU</span>
+    <h1 style="font-size: 2.75rem; font-weight: 800; line-height: 1.2; margin-bottom: 1rem;">
+      Portal Layanan Terpadu
+    </h1>
+    <p style="font-size: 1.05rem; color: #cbd5e1; line-height: 1.7;">
+      Satu pintu akses untuk seluruh kebutuhan akademik siswa, wali murid, pendidik, dan calon peserta didik baru SMP Islam Walisongo 2 Depok.
+    </p>
+  </div>
+</section>
+
+<div class="container" style="padding: 4rem 1.5rem;">
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2rem;">
+    <!-- Card 1: SIAKAD -->
+    <div id="siakad" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:20px; padding:2rem; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <div style="width:48px; height:48px; border-radius:14px; background:#ecfdf5; color:#047857; display:flex; align-items:center; justify-content:center; margin-bottom:1rem;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+        </div>
+        <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin-bottom:0.5rem;">SIAKAD (Sistem Akademik)</h3>
+        <p style="font-size:0.875rem; color:#64748b; line-height:1.6; margin-bottom:1.5rem;">
+          Pusat data informasi kehadiran harian siswa (Presensi Digital QR), rekapitulasi nilai tugas, dan jadwal pelajaran kelas 7, 8, dan 9.
+        </p>
+      </div>
+      <div>
+        <button onclick="openModal('modalRaportCheck')" class="btn-primary-hero" style="font-size:0.85rem; padding:0.6rem 1.25rem; width:100%; justify-content:center;">
+          Periksa Data Siswa (Raport) ➔
+        </button>
+      </div>
+    </div>
+
+    <!-- Card 2: CBT Ujian Online -->
+    <div id="cbt" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:20px; padding:2rem; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <div style="width:48px; height:48px; border-radius:14px; background:#f0fdf4; color:#16a34a; display:flex; align-items:center; justify-content:center; margin-bottom:1rem;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+        </div>
+        <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin-bottom:0.5rem;">E-Learning & CBT Online</h3>
+        <p style="font-size:0.875rem; color:#64748b; line-height:1.6; margin-bottom:1.5rem;">
+          Platform ujian berbasis komputer terintegrasi server lokal sekolah untuk Asesmen Sumatif Akhir Jenjang (ASAJ) dan latihan soal harian.
+        </p>
+      </div>
+      <div>
+        <button onclick="showToast('Server CBT aktif saat periode asesmen/ujian resmi.', 'info')" class="btn-secondary-hero" style="color:#064e3b; border-color:#064e3b; font-size:0.85rem; padding:0.6rem 1.25rem; width:100%; justify-content:center;">
+          Akses Portal Ujian Siswa
+        </button>
+      </div>
+    </div>
+
+    <!-- Card 3: E-Perpustakaan -->
+    <div id="perpus" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:20px; padding:2rem; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <div style="width:48px; height:48px; border-radius:14px; background:#fef3c7; color:#b45309; display:flex; align-items:center; justify-content:center; margin-bottom:1rem;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+        </div>
+        <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin-bottom:0.5rem;">E-Library & Kitab Digital</h3>
+        <p style="font-size:0.875rem; color:#64748b; line-height:1.6; margin-bottom:1.5rem;">
+          Katalog ribuan buku teks pelajaran Kurikulum Merdeka, ensiklopedia Islam, hadits digital, dan naskah tajwid mutqin yang dapat diakses santri.
+        </p>
+      </div>
+      <div>
+        <button onclick="showToast('Katalog E-Library dapat diakses santri dengan akun NISN.', 'info')" class="btn-secondary-hero" style="color:#064e3b; border-color:#064e3b; font-size:0.85rem; padding:0.6rem 1.25rem; width:100%; justify-content:center;">
+          Buka Katalog Buku & Kitab
+        </button>
+      </div>
+    </div>
+
+    <!-- Card 4: Kalkulator SPP & Keuangan -->
+    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:20px; padding:2rem; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <div style="width:48px; height:48px; border-radius:14px; background:#fff7ed; color:#ea580c; display:flex; align-items:center; justify-content:center; margin-bottom:1rem;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="6" x2="16" y2="6"></line><line x1="16" y1="14" x2="16" y2="18"></line></svg>
+        </div>
+        <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin-bottom:0.5rem;">Simulasi Biaya & SPP</h3>
+        <p style="font-size:0.875rem; color:#64748b; line-height:1.6; margin-bottom:1.5rem;">
+          Kalkulator transparan untuk menghitung rincian biaya uang pangkal, seragam, dan skema beasiswa hafalan Al-Qur'an.
+        </p>
+      </div>
+      <div>
+        <button onclick="openModal('modalKalkulator')" class="btn-primary-hero" style="font-size:0.85rem; padding:0.6rem 1.25rem; width:100%; justify-content:center;">
+          Buka Kalkulator Biaya ➔
+        </button>
+      </div>
+    </div>
+
+    <!-- Card 5: PPDB Online -->
+    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:20px; padding:2rem; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <div style="width:48px; height:48px; border-radius:14px; background:#ecfdf5; color:#059669; display:flex; align-items:center; justify-content:center; margin-bottom:1rem;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle></svg>
+        </div>
+        <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin-bottom:0.5rem;">Pendaftaran PPDB 2026</h3>
+        <p style="font-size:0.875rem; color:#64748b; line-height:1.6; margin-bottom:1.5rem;">
+          Pengisian formulir online untuk calon peserta didik baru dan pelacakan status penerimaan dengan mudah dan cepat.
+        </p>
+      </div>
+      <div>
+        <a href="/ppdb" class="btn-primary-hero" style="font-size:0.85rem; padding:0.6rem 1.25rem; width:100%; justify-content:center;">
+          Menuju Halaman PPDB ➔
+        </a>
+      </div>
+    </div>
+
+    <!-- Card 6: Konseling & BK -->
+    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:20px; padding:2rem; box-shadow:var(--shadow-sm); display:flex; flex-direction:column; justify-content:space-between;">
+      <div>
+        <div style="width:48px; height:48px; border-radius:14px; background:#ede9fe; color:#7c3aed; display:flex; align-items:center; justify-content:center; margin-bottom:1rem;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+        </div>
+        <h3 style="font-size:1.25rem; font-weight:800; color:#0f172a; margin-bottom:0.5rem;">Konseling BK & Pengaduan</h3>
+        <p style="font-size:0.875rem; color:#64748b; line-height:1.6; margin-bottom:1.5rem;">
+          Layanan bimbingan pribadi, akademik, dan konseling santri secara rahasia dan profesional bersama guru Bimbingan Konseling.
+        </p>
+      </div>
+      <div>
+        <a href="/#kontak" class="btn-secondary-hero" style="color:#064e3b; border-color:#064e3b; font-size:0.85rem; padding:0.6rem 1.25rem; width:100%; justify-content:center;">
+          Kirim Pesan Konsultasi ➔
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

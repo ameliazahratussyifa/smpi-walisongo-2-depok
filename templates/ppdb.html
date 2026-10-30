@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block title %}Penerimaan Peserta Didik Baru (PPDB) 2026/2027 - {{ school.nama }}{% endblock %}
+
+{% block content %}
+<section style="background: linear-gradient(135deg, #022c22 0%, #064e3b 100%); color: #ffffff; padding: 4rem 0 3rem 0; text-align: center;">
+  <div class="container" style="max-width: 800px;">
+    <span class="hero-pill-badge">PPDB TAHUN AJARAN 2026/2027</span>
+    <h1 style="font-size: 2.75rem; font-weight: 800; line-height: 1.2; margin-bottom: 1rem;">
+      Penerimaan Peserta Didik Baru
+    </h1>
+    <p style="font-size: 1.05rem; color: #cbd5e1; line-height: 1.7; margin-bottom: 2rem;">
+      Selamat datang calon santri dan siswa berprestasi. Pendaftaran gelombang 1 resmi dibuka dengan kuota terbatas dan beasiswa khusus Tahfidzul Qur'an.
+    </p>
+
+    <!-- Quota Stats Card -->
+    <div style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.25); border-radius: 16px; padding: 1.25rem 2rem; display: flex; justify-content: space-around; backdrop-filter: blur(8px);">
+      <div>
+        <div style="font-size: 1.75rem; font-weight: 800; color: #fbbf24;">120</div>
+        <div style="font-size: 0.75rem; color: #cbd5e1; text-transform: uppercase;">Total Kuota</div>
+      </div>
+      <div style="border-left: 1px solid rgba(255,255,255,0.2); height: 40px;"></div>
+      <div>
+        <div id="statTotalPpdb" style="font-size: 1.75rem; font-weight: 800; color: #ffffff;">2</div>
+        <div style="font-size: 0.75rem; color: #cbd5e1; text-transform: uppercase;">Pendaftar Masuk</div>
+      </div>
+      <div style="border-left: 1px solid rgba(255,255,255,0.2); height: 40px;"></div>
+      <div>
+        <div id="statSisaKuota" style="font-size: 1.75rem; font-weight: 800; color: #34d399;">118</div>
+        <div style="font-size: 0.75rem; color: #cbd5e1; text-transform: uppercase;">Sisa Kuota</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container" style="padding: 4rem 1.5rem;">
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: flex-start;">
+    <!-- Column 1: Info, Jalur & Persyaratan -->
+    <div>
+      <span class="section-pill-tag">PANDUAN PENDAFTARAN</span>
+      <h2 class="section-title">Syarat & Jalur Masuk</h2>
+      
+      <!-- Jalur Cards -->
+      <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem;">
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.25rem; box-shadow: var(--shadow-sm);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: #064e3b; margin: 0;">1. Jalur Beasiswa Tahfidz Qur'an</h3>
+            <span style="background: #ecfdf5; color: #047857; font-size: 0.75rem; font-weight: 800; padding: 0.2rem 0.6rem; border-radius: 999px;">Bebas Uang Pangkal</span>
+          </div>
+          <p style="font-size: 0.875rem; color: #475569; line-height: 1.6;">
+            Dikhususkan bagi calon santri yang memiliki hafalan minimal 2 Juz Al-Qur'an (mutqin) dengan melampirkan sertifikat tahfidz atau lulus tes sima'an bersama Asatidz.
+          </p>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.25rem; box-shadow: var(--shadow-sm);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0;">2. Jalur Prestasi Akademik & Ekskul</h3>
+            <span style="background: #fef3c7; color: #b45309; font-size: 0.75rem; font-weight: 800; padding: 0.2rem 0.6rem; border-radius: 999px;">Potongan Khusus</span>
+          </div>
+          <p style="font-size: 0.875rem; color: #475569; line-height: 1.6;">
+            Bagi lulusan berprestasi pada kejuaraan sains (OSN/KSM), kepramukaan, seni qasidah/hadroh, atau olahraga minimal tingkat kota Depok.
+          </p>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.25rem; box-shadow: var(--shadow-sm);">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0;">3. Jalur Reguler</h3>
+            <span style="background: #f1f5f9; color: #475569; font-size: 0.75rem; font-weight: 800; padding: 0.2rem 0.6rem; border-radius: 999px;">Umum</span>
+          </div>
+          <p style="font-size: 0.875rem; color: #475569; line-height: 1.6;">
+            Terbuka bagi seluruh lulusan SD/MI negeri maupun swasta dengan seleksi peminatan minat bakat dan wawancara orang tua.
+          </p>
+        </div>
+      </div>
+
+      <!-- Berkas Fisik Checklist -->
+      <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 16px; padding: 1.5rem;">
+        <h4 style="font-size: 1rem; font-weight: 800; color: #0f172a; margin-bottom: 0.75rem;">📋 Berkas Persyaratan PPDB:</h4>
+        <ul style="font-size: 0.875rem; color: #475569; display: flex; flex-direction: column; gap: 0.5rem; padding-left: 1.25rem;">
+          <li>Fotokopi Ijazah / Surat Keterangan Lulus (SKL) SD/MI yang dilegalisir (2 lembar).</li>
+          <li>Fotokopi Akta Kelahiran dan Kartu Keluarga (KK) (2 lembar).</li>
+          <li>Fotokopi KTP kedua orang tua / wali.</li>
+          <li>Pas foto 3x4 berwarna terbaru (3 lembar).</li>
+          <li>Sertifikat / piagam kejuaraan atau tahfidz (jika ada).</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Column 2: Live Registration Form -->
+    <div>
+      <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 24px; padding: 2.25rem; box-shadow: var(--shadow-md);">
+        <span class="section-pill-tag">REGISTRASI ONLINE LANGSUNG</span>
+        <h3 style="font-size: 1.4rem; font-weight: 800; color: #0f172a; margin-bottom: 0.5rem;">Formulir Pendaftaran Siswa Baru</h3>
+        <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.5rem;">Data akan langsung tersimpan di sistem dan menghasilkan Kartu Bukti Registrasi.</p>
+
+        <form id="ppdbPageForm" onsubmit="submitPpdbPage(event)">
+          <div class="form-group">
+            <label class="form-label">Nama Lengkap Siswa *</label>
+            <input type="text" id="pNama" class="form-input" placeholder="Nama Lengkap Sesuai Akta" required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label">NISN (10 Digit Angka) *</label>
+              <input type="text" id="pNisn" maxlength="10" class="form-input" placeholder="009xxxxxxx" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Jenis Kelamin *</label>
+              <select id="pJk" class="form-select" required>
+                <option value="Laki-laki">Laki-laki</option>
+                <option value="Perempuan">Perempuan</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Asal Sekolah (SD / MI) *</label>
+            <input type="text" id="pAsal" class="form-input" placeholder="Contoh: SDIT / SDN / MI..." required>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label">Nama Orang Tua / Wali *</label>
+              <input type="text" id="pWali" class="form-input" placeholder="Nama Ayah / Ibu" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">No. WhatsApp Aktif *</label>
+              <input type="tel" id="pWa" class="form-input" placeholder="08xxxxxxxxxx" required>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+              <label class="form-label">Pilihan Jalur *</label>
+              <select id="pJalur" class="form-select" required>
+                <option value="Jalur Reguler">Jalur Reguler</option>
+                <option value="Jalur Beasiswa Tahfidz">Jalur Beasiswa Tahfidz</option>
+                <option value="Jalur Prestasi">Jalur Prestasi</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Peminatan Kelas</label>
+              <select id="pMinat" class="form-select">
+                <option value="Kelas Tahfidz & IT">Kelas Tahfidz & IT</option>
+                <option value="Kelas Bilingual & Sains">Kelas Bilingual & Sains</option>
+                <option value="Kelas Reguler Berkarakter">Kelas Reguler Berkarakter</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Alamat Lengkap Tempat Tinggal</label>
+            <textarea id="pAlamat" rows="2" class="form-textarea" placeholder="Jalan, RT/RW, Kelurahan, Kota"></textarea>
+          </div>
+
+          <button type="submit" id="btnSubmitPpdbPage" class="btn-primary-hero" style="width: 100%; justify-content: center; padding: 0.8rem;">
+            Kirimkan Pendaftaran & Dapatkan Bukti ➔
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tracker Section on Bottom -->
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 2.5rem; margin-top: 4rem; box-shadow: var(--shadow-sm);">
+    <div style="text-align: center; max-width: 650px; margin: 0 auto 1.5rem auto;">
+      <span class="section-pill-tag">TRACKING SISTEM PPDB</span>
+      <h3 style="font-size: 1.5rem; font-weight: 800; color: #0f172a;">Lacak Status Berkas Pendaftaran Anda</h3>
+      <p style="font-size: 0.9rem; color: #64748b;">Ketikkan Nomor Registrasi atau NISN yang telah Anda daftarkan:</p>
+    </div>
+
+    <div style="max-width: 550px; margin: 0 auto;">
+      <div style="display: flex; gap: 0.5rem;">
+        <input type="text" id="ppdbPageTrackQuery" class="form-input" placeholder="Contoh: REG-2026-WS001 atau NISN..." value="REG-2026-WS001">
+        <button onclick="trackPpdbPage()" class="btn-primary-hero" style="font-size: 0.85rem; padding: 0.65rem 1.35rem; white-space: nowrap;">
+          Lacak Status
+        </button>
+      </div>
+      <div id="ppdbPageTrackResult"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+async function submitPpdbPage(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btnSubmitPpdbPage');
+  btn.innerHTML = 'Memproses...';
+  btn.disabled = true;
+
+  const payload = {
+    nama_lengkap: document.getElementById('pNama').value.trim(),
+    nisn: document.getElementById('pNisn').value.trim(),
+    jenis_kelamin: document.getElementById('pJk').value,
+    asal_sekolah: document.getElementById('pAsal').value.trim(),
+    nama_wali: document.getElementById('pWali').value.trim(),
+    no_wa_wali: document.getElementById('pWa').value.trim(),
+    jalur_pendaftaran: document.getElementById('pJalur').value,
+    pilihan_peminatan: document.getElementById('pMinat').value,
+    alamat_lengkap: document.getElementById('pAlamat').value.trim()
+  };
+
+  try {
+    const res = await fetch('/api/ppdb/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+    if (res.ok && result.status === 'success') {
+      document.getElementById('ppdbPageForm').reset();
+      showPpdbSuccessModal(result);
+    } else {
+      showToast(result.detail || 'Gagal menyimpan pendaftaran', 'error');
+    }
+  } catch (err) {
+    showToast('Kendala jaringan saat mendaftar.', 'error');
+  } finally {
+    btn.innerHTML = 'Kirimkan Pendaftaran & Dapatkan Bukti ➔';
+    btn.disabled = false;
+  }
+}
+
+async function trackPpdbPage() {
+  const q = document.getElementById('ppdbPageTrackQuery').value.trim();
+  const resDiv = document.getElementById('ppdbPageTrackResult');
+  if (!q) return;
+
+  resDiv.innerHTML = '<p style="text-align:center; padding:1rem; color:#64748b;">Memeriksa status...</p>';
+  try {
+    const res = await fetch(`/api/ppdb/check/${encodeURIComponent(q)}`);
+    const data = await res.json();
+    if (data.status === 'success') {
+      const d = data.data;
+      resDiv.innerHTML = `
+        <div style="background:#ecfdf5; border:1px solid #10b981; border-radius:12px; padding:1.25rem; margin-top:1rem;">
+          <h4 style="font-size:1.1rem; color:#064e3b; margin:0 0 0.3rem 0;">${d.nama_lengkap}</h4>
+          <p style="font-size:0.85rem; color:#047857; margin:0 0 0.75rem 0;">No. Reg: <strong>${d.nomor_registrasi}</strong> • NISN: ${d.nisn}</p>
+          <div style="font-size:0.85rem; color:#334155; line-height:1.6;">
+            <p><strong>Asal Sekolah:</strong> ${d.asal_sekolah}</p>
+            <p><strong>Jalur:</strong> ${d.jalur_pendaftaran}</p>
+            <p><strong>Status Seleksi:</strong> <span style="background:#047857; color:#fff; font-weight:800; padding:0.2rem 0.6rem; border-radius:999px;">${d.status_seleksi}</span></p>
+            <p style="margin-top:0.5rem; color:#475569;">${d.catatan}</p>
+          </div>
+        </div>
+      `;
+    } else {
+      resDiv.innerHTML = `<div style="background:#fef2f2; border:1px solid #f87171; border-radius:12px; padding:1rem; margin-top:1rem; color:#991b1b; font-size:0.875rem;">⚠️ ${data.message}</div>`;
+    }
+  } catch (e) {
+    resDiv.innerHTML = '<p style="color:red; margin-top:1rem;">Kendala jaringan.</p>';
+  }
+}
+</script>
+{% endblock %}

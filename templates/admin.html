@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}Portal CMS Admin - {{ school.nama }}{% endblock %}
+
+{% block content %}
+<section style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 3rem 0;">
+  <div class="container">
+    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+      <div>
+        <span class="hero-pill-badge" style="background:rgba(245,158,11,0.2); border-color:#f59e0b; color:#fbbf24;">
+          SISTEM INFORMASI MANAJEMEN SEKOLAH
+        </span>
+        <h1 style="font-size:2rem; font-weight:800; margin-top:0.5rem;">
+          Portal CMS & Admin Dashboard
+        </h1>
+        <p style="font-size:0.875rem; color:#94a3b8;">{{ school.nama }} • Yayasan PP. Hj. Dardjah Amin</p>
+      </div>
+
+      <div style="display:flex; gap:0.75rem;">
+        <button onclick="refreshAdminData()" class="btn-primary-hero" style="font-size:0.85rem; padding:0.55rem 1rem;">
+          🔄 Perbarui Data
+        </button>
+        <a href="/" class="btn-secondary-hero" style="font-size:0.85rem; padding:0.55rem 1rem;">
+          Lihat Web Utama
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container" style="padding: 3rem 1.5rem;">
+  <!-- Stat Cards -->
+  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1.25rem; margin-bottom:2.5rem;">
+    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; padding:1.25rem; box-shadow:var(--shadow-sm);">
+      <div style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase;">Total Pendaftar PPDB</div>
+      <div id="admStatPpdb" style="font-size:2rem; font-weight:800; color:#064e3b; margin:0.25rem 0;">-</div>
+      <div style="font-size:0.75rem; color:#059669;">Data tersimpan di SQLite DB</div>
+    </div>
+
+    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; padding:1.25rem; box-shadow:var(--shadow-sm);">
+      <div style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase;">Pesan & Konsultasi Masuk</div>
+      <div id="admStatPesan" style="font-size:2rem; font-weight:800; color:#d97706; margin:0.25rem 0;">-</div>
+      <div id="admStatPesanBaru" style="font-size:0.75rem; color:#ea580c;">- pesan baru</div>
+    </div>
+
+    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; padding:1.25rem; box-shadow:var(--shadow-sm);">
+      <div style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase;">Publikasi Berita & Agenda</div>
+      <div id="admStatBerita" style="font-size:2rem; font-weight:800; color:#2563eb; margin:0.25rem 0;">-</div>
+      <div style="font-size:0.75rem; color:#3b82f6;">Artikel aktif terbit</div>
+    </div>
+
+    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; padding:1.25rem; box-shadow:var(--shadow-sm);">
+      <div style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase;">Dewan Asatidz & Guru</div>
+      <div id="admStatGuru" style="font-size:2rem; font-weight:800; color:#7c3aed; margin:0.25rem 0;">-</div>
+      <div style="font-size:0.75rem; color:#8b5cf6;">Tenaga Pendidik</div>
+    </div>
+  </div>
+
+  <!-- PPDB Management Table -->
+  <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:20px; padding:2rem; box-shadow:var(--shadow-sm); margin-bottom:3rem;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+      <div>
+        <h3 style="font-size:1.35rem; font-weight:800; color:#0f172a; margin:0;">📋 Data Pendaftar PPDB 2026/2027</h3>
+        <p style="font-size:0.85rem; color:#64748b; margin:0;">Kelola status berkas, nomor WhatsApp wali, dan catatan seleksi pendaftar.</p>
+      </div>
+      <div>
+        <button onclick="openModal('modalPpdbRegister')" class="btn-primary-hero" style="font-size:0.8rem; padding:0.5rem 1rem;">
+          + Tambah Pendaftar Manual
+        </button>
+      </div>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table style="width:100%; border-collapse:collapse; font-size:0.875rem;">
+        <thead>
+          <tr style="background:#f8fafc; border-bottom:2px solid #e2e8f0; text-align:left; color:#475569;">
+            <th style="padding:0.75rem 1rem;">No. Registrasi</th>
+            <th style="padding:0.75rem 1rem;">Nama Calon Siswa</th>
+            <th style="padding:0.75rem 1rem;">NISN / Asal Sekolah</th>
+            <th style="padding:0.75rem 1rem;">Jalur Pendaftaran</th>
+            <th style="padding:0.75rem 1rem;">Wali / No. WA</th>
+            <th style="padding:0.75rem 1rem;">Status Seleksi</th>
+            <th style="padding:0.75rem 1rem; text-align:center;">Aksi</th>
+          </tr>
+        </thead>
+        <tbody id="admPpdbTableBody">
+          <tr><td colspan="7" style="padding:2rem; text-align:center; color:#64748b;">Memuat data...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Incoming Messages Section -->
+  <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:20px; padding:2rem; box-shadow:var(--shadow-sm);">
+    <h3 style="font-size:1.35rem; font-weight:800; color:#0f172a; margin-bottom:0.5rem;">💬 Pesan Konsultasi & Pertanyaan Masuk</h3>
+    <p style="font-size:0.85rem; color:#64748b; margin-bottom:1.5rem;">Pesan dari calon orang tua siswa melalui website dan formulir kontak.</p>
+
+    <div id="admPesanList" style="display:flex; flex-direction:column; gap:1rem;">
+      <p style="color:#64748b; padding:1rem; text-align:center;">Memuat pesan...</p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Update Status PPDB -->
+<div id="modalUpdatePpdb" class="modal-backdrop">
+  <div class="modal-window">
+    <div class="modal-header">
+      <h3 class="modal-header-title">✏️ Perbarui Status Seleksi Calon Siswa</h3>
+      <button class="btn-close-modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="formUpdateStatus" onsubmit="submitStatusUpdate(event)">
+        <input type="hidden" id="editPpdbId">
+        <div class="form-group">
+          <label class="form-label">Nama Siswa</label>
+          <input type="text" id="editPpdbNama" class="form-input" readonly style="background:#f1f5f9;">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status Seleksi Baru *</label>
+          <select id="editPpdbStatus" class="form-select" required>
+            <option value="Menunggu Verifikasi Berkas">Menunggu Verifikasi Berkas</option>
+            <option value="Menunggu Seleksi Wawancara">Menunggu Seleksi Wawancara</option>
+            <option value="Lulus Tes Sima'an Tahfidz">Lulus Tes Sima'an Tahfidz</option>
+            <option value="Diterima (Tahap 1)">Diterima (Tahap 1)</option>
+            <option value="Cadangan">Cadangan</option>
+            <option value="Tidak Memenuhi Syarat">Tidak Memenuhi Syarat</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Catatan Panitia untuk Siswa / Wali</label>
+          <textarea id="editPpdbCatatan" rows="3" class="form-textarea" placeholder="Contoh: Jadwal wawancara hari Sabtu jam 09.00 WIB."></textarea>
+        </div>
+        <button type="submit" class="btn-primary-hero" style="width:100%; justify-content:center; padding:0.75rem;">
+          Simpan Pembaruan Status ➔
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  refreshAdminData();
+});
+
+async function refreshAdminData() {
+  try {
+    const res = await fetch('/api/admin/overview');
+    const data = await res.json();
+    if (data.status === 'success') {
+      const s = data.stats;
+      document.getElementById('admStatPpdb').textContent = s.total_ppdb;
+      document.getElementById('admStatPesan').textContent = s.total_pesan;
+      document.getElementById('admStatPesanBaru').textContent = `${s.pesan_baru} pesan belum dibaca`;
+      document.getElementById('admStatBerita').textContent = s.total_berita;
+      document.getElementById('admStatGuru').textContent = s.total_guru;
+
+      renderPesanList(data.recent_pesan);
+    }
+
+    // Load all PPDB applicants
+    const resPpdb = await fetch('/api/admin/ppdb-all');
+    const dataPpdb = await resPpdb.json();
+    if (dataPpdb.status === 'success') {
+      renderPpdbTable(dataPpdb.data);
+    }
+  } catch (e) {
+    showToast('Kendala memuat data dashboard', 'error');
+  }
+}
+
+function renderPpdbTable(list) {
+  const tbody = document.getElementById('admPpdbTableBody');
+  if (!list.length) {
+    tbody.innerHTML = '<tr><td colspan="7" style="padding:2rem; text-align:center; color:#64748b;">Belum ada data pendaftar.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = list.map(item => {
+    const isDiterima = item.status_seleksi.toLowerCase().includes('diterima');
+    const badgeBg = isDiterima ? '#ecfdf5' : '#fef3c7';
+    const badgeColor = isDiterima ? '#047857' : '#b45309';
+
+    return `
+      <tr style="border-bottom:1px solid #f1f5f9;">
+        <td style="padding:0.85rem 1rem; font-weight:800; color:#064e3b;">${item.nomor_registrasi}</td>
+        <td style="padding:0.85rem 1rem; font-weight:700; color:#0f172a;">${item.nama_lengkap}</td>
+        <td style="padding:0.85rem 1rem; color:#475569;">${item.nisn}<br><small style="color:#64748b;">${item.asal_sekolah}</small></td>
+        <td style="padding:0.85rem 1rem;"><span style="background:#f1f5f9; padding:0.2rem 0.5rem; border-radius:6px; font-size:0.75rem; font-weight:700;">${item.jalur_pendaftaran}</span></td>
+        <td style="padding:0.85rem 1rem;">${item.nama_wali}<br><a href="https://wa.me/${item.no_wa_wali.replace(/[^0-9]/g, '')}" target="_blank" style="color:#059669; font-weight:700; font-size:0.75rem;">📲 WA: ${item.no_wa_wali}</a></td>
+        <td style="padding:0.85rem 1rem;"><span style="background:${badgeBg}; color:${badgeColor}; font-weight:800; font-size:0.75rem; padding:0.25rem 0.65rem; border-radius:999px;">${item.status_seleksi}</span></td>
+        <td style="padding:0.85rem 1rem; text-align:center;">
+          <button onclick="editStatus(${item.id}, '${item.nama_lengkap.replace(/'/g, "\\'")}', '${item.status_seleksi.replace(/'/g, "\\'")}', '${(item.catatan || '').replace(/'/g, "\\'")}')" class="btn-mobile-mode" style="font-size:0.75rem; padding:0.3rem 0.75rem;">
+            Edit Status
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function renderPesanList(list) {
+  const container = document.getElementById('admPesanList');
+  if (!list.length) {
+    container.innerHTML = '<p style="color:#64748b; text-align:center; padding:1rem;">Belum ada pesan masuk.</p>';
+    return;
+  }
+
+  container.innerHTML = list.map(p => `
+    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:1.25rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+        <span style="font-weight:800; color:#0f172a;">${p.nama} (${p.kategori})</span>
+        <span style="font-size:0.75rem; color:#64748b;">${p.created_at || 'Hari ini'}</span>
+      </div>
+      <h4 style="font-size:0.95rem; font-weight:700; color:#064e3b; margin:0 0 0.35rem 0;">${p.subjek}</h4>
+      <p style="font-size:0.85rem; color:#334155; line-height:1.6; margin-bottom:0.75rem;">${p.pesan}</p>
+      <a href="https://wa.me/${p.no_whatsapp.replace(/[^0-9]/g, '')}?text=Halo%20Bapak/Ibu%20${encodeURIComponent(p.nama)},%20terima%20kasih%20telah%20menghubungi%20SMP%20Islam%20Walisongo%202%20Depok." target="_blank" style="color:#059669; font-size:0.8rem; font-weight:700;">
+        💬 Balas Pesan via WhatsApp (${p.no_whatsapp}) ➔
+      </a>
+    </div>
+  `).join('');
+}
+
+function editStatus(id, nama, status, catatan) {
+  document.getElementById('editPpdbId').value = id;
+  document.getElementById('editPpdbNama').value = nama;
+  document.getElementById('editPpdbStatus').value = status;
+  document.getElementById('editPpdbCatatan').value = catatan;
+  openModal('modalUpdatePpdb');
+}
+
+async function submitStatusUpdate(e) {
+  e.preventDefault();
+  const id = document.getElementById('editPpdbId').value;
+  const status = document.getElementById('editPpdbStatus').value;
+  const catatan = document.getElementById('editPpdbCatatan').value;
+
+  const formData = new FormData();
+  formData.append('id', id);
+  formData.append('status', status);
+  formData.append('catatan', catatan);
+
+  try {
+    const res = await fetch('/api/admin/ppdb-update-status', {
+      method: 'POST',
+      body: formData
+    });
+    const result = await res.json();
+    if (result.status === 'success') {
+      showToast('Status seleksi siswa berhasil diperbarui!', 'success');
+      closeModal('modalUpdatePpdb');
+      refreshAdminData();
+    }
+  } catch (err) {
+    showToast('Gagal memperbarui status', 'error');
+  }
+}
+</script>
+{% endblock %}
