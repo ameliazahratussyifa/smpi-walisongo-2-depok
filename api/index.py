@@ -23,7 +23,7 @@ from backend.initial_data import seed_data
 from backend.models import PPDBRegistrationCreate, PesanKontakCreate, RaportCheckRequest, AIQueryRequest
 from backend.auth import (
     hash_password, verify_password, create_session_token,
-    get_current_user, COOKIE_NAME, SESSION_DURATION_SECONDS
+    get_current_user, record_system_log, COOKIE_NAME, SESSION_DURATION_SECONDS
 )
 from backend.supabase_client import (
     is_supabase_enabled,
@@ -38,7 +38,9 @@ from backend.supabase_client import (
     supabase_get_all_users,
     supabase_insert_user,
     supabase_update_user_password,
-    supabase_update_user_last_login
+    supabase_update_user_last_login,
+    supabase_insert_log,
+    supabase_get_all_logs
 )
 
 # Initialize Database & Seed data if necessary
@@ -243,6 +245,8 @@ async def login_page(request: Request):
     """Login Portal for Master and Admin accounts."""
     user = get_current_user(request)
     if user:
+        if user.get("role") == "master":
+            return RedirectResponse(url="/admin/master", status_code=303)
         return RedirectResponse(url="/admin", status_code=303)
     return templates.TemplateResponse(
         request=request,
@@ -297,6 +301,16 @@ async def api_auth_login(
     except Exception:
         pass
 
+    # Record Audit Trail Log
+    client_ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "127.0.0.1").split(",")[0].strip()
+    record_system_log(
+        action="LOGIN_SUCCESS",
+        detail=f"Pengguna '{user_row['username']}' ({user_row['role'].upper()}) berhasil login ke sistem.",
+        username=user_row["username"],
+        user_id=user_row["id"],
+        ip_address=client_ip
+    )
+
     token = create_session_token(
         user_id=user_row["id"],
         username=user_row["username"],
@@ -329,8 +343,18 @@ async def api_auth_login(
 
 @app.get("/logout")
 @app.post("/api/auth/logout")
-async def api_auth_logout():
+async def api_auth_logout(request: Request):
     """Sign out user and revoke session cookie."""
+    user = get_current_user(request)
+    if user:
+        client_ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "127.0.0.1").split(",")[0].strip()
+        record_system_log(
+            action="LOGOUT",
+            detail=f"Pengguna '{user['username']}' keluar dari sistem.",
+            username=user["username"],
+            user_id=user["id"],
+            ip_address=client_ip
+        )
     response = RedirectResponse(url="/login?notice=logged_out", status_code=303)
     response.delete_cookie(key=COOKIE_NAME)
     return response
@@ -345,24 +369,10 @@ async def api_auth_me(request: Request):
 
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_page(request: Request):
-    """Admin CMS Dashboard. Protected route requiring Master or Admin login."""
+    """Admin CMS Dashboard (School CMS & PPDB Operations)."""
     user = get_current_user(request)
     if not user:
         return RedirectResponse(url="/login?notice=silakan_login&redirect=/admin", status_code=303)
-
-    all_users = []
-    if user["role"] == "master":
-        if is_supabase_enabled():
-            sb_users = supabase_get_all_users()
-            if sb_users:
-                all_users = sb_users
-        if not all_users:
-            conn = get_db_connection()
-            user_rows = conn.execute(
-                "SELECT id, username, nama_lengkap, role, email, is_active, created_at, last_login FROM users ORDER BY id ASC"
-            ).fetchall()
-            all_users = [dict(u) for u in user_rows]
-            conn.close()
 
     return templates.TemplateResponse(
         request=request,
@@ -370,8 +380,57 @@ async def admin_page(request: Request):
         context={
             "school": SCHOOL_INFO,
             "active_page": "admin",
+            "user": user
+        }
+    )
+
+@app.get("/admin/master", response_class=HTMLResponse)
+async def admin_master_page(request: Request):
+    """Master Authority Console: Role Management, User Directory & System Audit Logs."""
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login?notice=silakan_login&redirect=/admin/master", status_code=303)
+    if user.get("role") != "master":
+        return RedirectResponse(url="/admin?notice=unauthorized_master", status_code=303)
+
+    all_users = []
+    if is_supabase_enabled():
+        sb_users = supabase_get_all_users()
+        if sb_users:
+            all_users = sb_users
+    if not all_users:
+        conn = get_db_connection()
+        user_rows = conn.execute(
+            "SELECT id, username, nama_lengkap, role, email, is_active, created_at, last_login FROM users ORDER BY id ASC"
+        ).fetchall()
+        all_users = [dict(u) for u in user_rows]
+        conn.close()
+
+    all_logs = []
+    if is_supabase_enabled():
+        sb_logs = supabase_get_all_logs(limit=100)
+        if sb_logs:
+            all_logs = sb_logs
+    if not all_logs:
+        try:
+            conn = get_db_connection()
+            log_rows = conn.execute(
+                "SELECT id, user_id, username, action, detail, ip_address, created_at FROM system_logs ORDER BY id DESC LIMIT 100"
+            ).fetchall()
+            all_logs = [dict(l) for l in log_rows]
+            conn.close()
+        except Exception:
+            pass
+
+    return templates.TemplateResponse(
+        request=request,
+        name="admin_master.html",
+        context={
+            "school": SCHOOL_INFO,
+            "active_page": "admin_master",
             "user": user,
-            "all_users": all_users
+            "all_users": all_users,
+            "all_logs": all_logs
         }
     )
 
@@ -790,6 +849,7 @@ async def api_admin_ppdb_all():
 
 @app.post("/api/admin/ppdb-update-status")
 async def api_admin_ppdb_update(
+    request: Request,
     id: int = Form(...),
     status: str = Form(...),
     catatan: str = Form("")
@@ -806,9 +866,46 @@ async def api_admin_ppdb_update(
     """, (status, catatan, id))
     conn.commit()
     conn.close()
+
+    # Record Audit Log
+    current_user = get_current_user(request)
+    client_ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "127.0.0.1").split(",")[0].strip()
+    record_system_log(
+        action="PPDB_STATUS_UPDATE",
+        detail=f"Status pendaftar ID {id} diperbarui menjadi '{status}'. Catatan: {catatan or '-'}",
+        username=current_user["username"] if current_user else "admin",
+        user_id=current_user["id"] if current_user else None,
+        ip_address=client_ip
+    )
+
     return {"status": "success", "message": "Status calon siswa berhasil diperbarui"}
 
-# ==================== MASTER ROLE: USER MANAGEMENT ====================
+# ==================== MASTER ROLE: USER MANAGEMENT & AUDIT LOGS ====================
+
+@app.get("/api/admin/logs")
+async def api_admin_list_logs(request: Request):
+    """Retrieve audit trail logs (Master-only)."""
+    current_user = get_current_user(request)
+    if not current_user or current_user["role"] != "master":
+        raise HTTPException(status_code=403, detail="Hanya Akun Master yang memiliki otorisasi melihat log sistem.")
+
+    logs = []
+    if is_supabase_enabled():
+        sb_logs = supabase_get_all_logs(limit=100)
+        if sb_logs:
+            logs = sb_logs
+    if not logs:
+        try:
+            conn = get_db_connection()
+            rows = conn.execute(
+                "SELECT id, user_id, username, action, detail, ip_address, created_at FROM system_logs ORDER BY id DESC LIMIT 100"
+            ).fetchall()
+            logs = [dict(r) for r in rows]
+            conn.close()
+        except Exception:
+            pass
+
+    return {"status": "success", "data": logs}
 
 @app.get("/api/admin/users")
 async def api_admin_list_users(request: Request):
@@ -872,6 +969,16 @@ async def api_admin_create_user(
     conn.commit()
     conn.close()
 
+    # Record Audit Log
+    client_ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "127.0.0.1").split(",")[0].strip()
+    record_system_log(
+        action="USER_CREATED",
+        detail=f"Akun baru dibuat: @{clean_username} ({nama_lengkap.strip()}) dengan role '{role.upper()}'.",
+        username=current_user["username"],
+        user_id=current_user["id"],
+        ip_address=client_ip
+    )
+
     return {"status": "success", "message": f"Akun '{clean_username}' ({role.upper()}) berhasil dibuat!"}
 
 @app.post("/api/admin/users/reset-password")
@@ -896,6 +1003,16 @@ async def api_admin_reset_password(
     conn.execute("UPDATE users SET password_hash = ? WHERE id = ?", (hashed_pw, user_id))
     conn.commit()
     conn.close()
+
+    # Record Audit Log
+    client_ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "127.0.0.1").split(",")[0].strip()
+    record_system_log(
+        action="PASSWORD_RESET",
+        detail=f"Kata sandi untuk akun pengguna ID {user_id} telah direset.",
+        username=current_user["username"],
+        user_id=current_user["id"],
+        ip_address=client_ip
+    )
 
     return {"status": "success", "message": "Kata sandi pengguna berhasil diperbarui!"}
 

@@ -167,6 +167,19 @@ def init_db():
     );
     """)
 
+    # Table: Audit Log & Aktivitas Sistem (Khusus Master)
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS system_logs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        username TEXT,
+        action TEXT NOT NULL,
+        detail TEXT NOT NULL,
+        ip_address TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
     conn.commit()
     conn.close()
 

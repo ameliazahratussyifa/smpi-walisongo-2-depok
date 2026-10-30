@@ -170,3 +170,29 @@ def supabase_update_user_last_login(user_id: int) -> bool:
         print(f"[Supabase Update Last Login Notice] {e}")
         return False
 
+# ==================== SYSTEM LOGS METHODS ====================
+
+def supabase_insert_log(log_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    sb = get_supabase()
+    if not sb:
+        return None
+    try:
+        res = sb.table("system_logs").insert(log_data).execute()
+        if res.data and len(res.data) > 0:
+            return res.data[0]
+    except Exception as e:
+        print(f"[Supabase Log Insert Error] {e}")
+    return None
+
+def supabase_get_all_logs(limit: int = 50) -> Optional[List[Dict[str, Any]]]:
+    sb = get_supabase()
+    if not sb:
+        return None
+    try:
+        res = sb.table("system_logs").select("*").order("id", desc=True).limit(limit).execute()
+        return res.data
+    except Exception as e:
+        print(f"[Supabase Log Query Error] {e}")
+    return None
+
+

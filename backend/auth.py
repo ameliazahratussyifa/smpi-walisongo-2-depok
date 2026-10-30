@@ -86,3 +86,31 @@ def get_current_user(request: Request) -> Optional[Dict[str, Any]]:
         return None
         
     return verify_session_token(token)
+
+def record_system_log(action: str, detail: str, username: str = "system", user_id: Optional[int] = None, ip_address: str = "127.0.0.1") -> None:
+    """Records audit trail log into Supabase and local SQLite."""
+    try:
+        from backend.supabase_client import is_supabase_enabled, supabase_insert_log
+        if is_supabase_enabled():
+            supabase_insert_log({
+                "action": action,
+                "detail": detail,
+                "username": username,
+                "user_id": user_id,
+                "ip_address": ip_address
+            })
+    except Exception as e:
+        print(f"[Supabase Log Warning] {e}")
+
+    try:
+        from backend.database import get_db_connection
+        conn = get_db_connection()
+        conn.execute("""
+        INSERT INTO system_logs (user_id, username, action, detail, ip_address)
+        VALUES (?, ?, ?, ?, ?)
+        """, (user_id, username, action, detail, ip_address))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"[Local Log Warning] {e}")
+

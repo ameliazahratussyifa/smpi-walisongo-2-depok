@@ -58,8 +58,8 @@
         </div>
       </a>
 
-      <!-- Desktop Nav Items -->
-      <ul class="nav-menu">
+      <!-- Desktop & Mobile Nav Items -->
+      <ul class="nav-menu" id="mainNavMenu">
         <li class="nav-item">
           <a href="/" class="nav-link {% if active_page == 'beranda' %}active{% endif %}">Beranda</a>
         </li>
@@ -90,15 +90,59 @@
         <li class="nav-item">
           <a href="/#kontak" class="nav-link">Kontak</a>
         </li>
+
+        <!-- Mobile Drawer Content (Visible only on phone/tablet) -->
+        <li class="mobile-drawer-extra">
+          <div class="mobile-drawer-ppdb-card">
+            <div class="drawer-ppdb-badge">🌟 PENDAFTARAN SISWA BARU</div>
+            <div class="drawer-ppdb-title">PPDB Online TA 2026/2027</div>
+            <p class="drawer-ppdb-desc">Daftar sekarang secara online untuk kemudahan seleksi & fasilitas beasiswa.</p>
+            <a href="/ppdb" class="drawer-ppdb-btn">Buka Formulir PPDB Online ➔</a>
+          </div>
+
+          <div class="mobile-drawer-footer-card">
+            <div class="mobile-footer-section-title">Akses Khusus & Kontak Humas</div>
+            
+            <a href="/login" class="mobile-login-btn">
+              <span style="font-size: 1.1rem;">🔐</span>
+              <span style="flex: 1; text-align: left;">Portal Login Petugas (Master/Admin)</span>
+              <span>➔</span>
+            </a>
+
+            <div class="mobile-contact-links">
+              <a href="https://wa.me/6281290904356" target="_blank" class="mobile-contact-item">
+                <span class="m-icon">💬</span>
+                <div>
+                  <div class="m-label">WhatsApp Resmi</div>
+                  <div class="m-val">{{ school.whatsapp }}</div>
+                </div>
+              </a>
+              <a href="tel:02177824356" class="mobile-contact-item">
+                <span class="m-icon">📞</span>
+                <div>
+                  <div class="m-label">Telepon Kantor</div>
+                  <div class="m-val">{{ school.telepon }}</div>
+                </div>
+              </a>
+            </div>
+
+            <div class="mobile-npsn-text">
+              🛡️ NPSN: {{ school.npsn }} • Terakreditasi {{ school.akreditasi }} (Unggul)
+            </div>
+          </div>
+        </li>
       </ul>
 
       <!-- Nav Action Button -->
       <div class="nav-actions">
-        <a href="/ppdb" class="btn-cta-ppdb">
-          DAFTAR PPDB 2026 ➔
+        <a href="/ppdb" class="btn-cta-ppdb" title="Pendaftaran Peserta Didik Baru 2026">
+          <span class="cta-text-full">DAFTAR PPDB 2026 ➔</span>
+          <span class="cta-text-mobile">PPDB ➔</span>
         </a>
-        <button class="btn-menu-toggle" aria-label="Toggle Menu Navigation">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        <button class="btn-menu-toggle" id="btnMenuToggle" aria-label="Toggle Menu Navigasi" aria-expanded="false">
+          <span class="toggle-bar"></span>
+          <span class="toggle-bar"></span>
+          <span class="toggle-bar"></span>
         </button>
       </div>
     </div>

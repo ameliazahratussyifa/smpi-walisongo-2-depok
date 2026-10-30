@@ -1,59 +1,349 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Masuk Terproteksi - {{ school.nama }}</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#022c22">
 
-{% block title %}Masuk Administrator & Master - {{ school.nama }}{% endblock %}
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/static/images/logo-walisongo.svg">
 
-{% block content %}
-<section class="login-page-section" style="min-height: 85vh; display: flex; align-items: center; justify-content: center; padding: 4rem 1rem; background: radial-gradient(circle at 50% 20%, #064e3b 0%, #022c22 45%, #0f172a 100%); position: relative; overflow: hidden;">
-  
-  <!-- Subtle decorative ambient glows -->
-  <div style="position: absolute; top: -100px; left: 50%; transform: translateX(-50%); width: 600px; height: 600px; background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
-  <div style="position: absolute; bottom: -150px; right: 10%; width: 450px; height: 450px; background: radial-gradient(circle, rgba(245, 158, 11, 0.08) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
+  <!-- Core Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Amiri:wght@700&display=swap" rel="stylesheet">
 
-  <div class="login-card-container" style="width: 100%; max-width: 480px; position: relative; z-index: 10;">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      background: radial-gradient(circle at 50% 20%, #064e3b 0%, #022c22 45%, #030712 100%);
+      color: #0f172a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Security Grid & Glow Background Effect */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image: 
+        radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 70%),
+        linear-gradient(rgba(16, 185, 129, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(16, 185, 129, 0.04) 1px, transparent 1px);
+      background-size: 100% 100%, 36px 36px, 36px 36px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .ambient-glow-1 {
+      position: absolute;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .ambient-glow-2 {
+      position: absolute;
+      bottom: -150px;
+      right: 5%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.07) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 440px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Isolated High-Security Card */
+    .login-card {
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      border-radius: 28px;
+      box-shadow: 
+        0 25px 50px -12px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(16, 185, 129, 0.25),
+        0 0 40px rgba(6, 78, 59, 0.2);
+      padding: 2.5rem 2.25rem;
+      transition: all 0.3s ease;
+    }
+
+    @media (max-width: 480px) {
+      .login-card {
+        padding: 2rem 1.5rem;
+        border-radius: 22px;
+      }
+    }
+
+    .security-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(6, 78, 59, 0.07);
+      border: 1px solid rgba(6, 78, 59, 0.15);
+      color: #064e3b;
+      padding: 0.3rem 0.85rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .brand-crest {
+      width: 68px;
+      height: 68px;
+      background: linear-gradient(135deg, #064e3b 0%, #047857 100%);
+      border-radius: 20px;
+      box-shadow: 0 12px 24px rgba(6, 78, 59, 0.35);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #fbbf24;
+      margin-bottom: 1rem;
+    }
+
+    .brand-crest img {
+      width: 42px;
+      height: 42px;
+      object-fit: contain;
+    }
+
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 0.4rem;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.1rem;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+
+    .form-input {
+      width: 100%;
+      height: 48px;
+      padding: 0 1rem 0 2.85rem;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      font-size: 0.925rem;
+      color: #0f172a;
+      background: #ffffff;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus {
+      border-color: #059669;
+      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+    }
+
+    .btn-toggle-pass {
+      position: absolute;
+      right: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1.05rem;
+      color: #64748b;
+      padding: 0.25rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .btn-login {
+      width: 100%;
+      height: 50px;
+      background: linear-gradient(135deg, #059669 0%, #064e3b 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: 14px;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(6, 78, 59, 0.35);
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn-login:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(6, 78, 59, 0.45);
+      background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+    }
+
+    .btn-login:active {
+      transform: translateY(0);
+    }
+
+    /* Quick Demo Account Selector */
+    .quick-selector {
+      background: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 14px;
+      padding: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .quick-btn {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 0.55rem 0.65rem;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .quick-btn:hover {
+      border-color: #059669;
+      box-shadow: 0 2px 8px rgba(5, 150, 105, 0.15);
+    }
+
+    .alert-box {
+      display: none;
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      margin-bottom: 1.25rem;
+      line-height: 1.5;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: #94a3b8;
+      font-size: 0.825rem;
+      font-weight: 600;
+      text-decoration: none;
+      margin-top: 1.5rem;
+      transition: color 0.2s ease;
+    }
+
+    .back-link:hover {
+      color: #34d399;
+    }
+
+    .security-footer {
+      margin-top: 1.5rem;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.75rem;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Light Effects -->
+  <div class="bg-grid"></div>
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
+  <div class="login-container">
     
-    <!-- Login Card -->
-    <div style="background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.4); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(16, 185, 129, 0.2); padding: 2.5rem 2rem; transition: transform 0.3s ease;">
+    <!-- Focused Security Card -->
+    <div class="login-card">
       
-      <!-- Brand & Header -->
-      <div style="text-align: center; margin-bottom: 2rem;">
-        <div style="display: inline-flex; align-items: center; justify-content: center; width: 72px; height: 72px; background: linear-gradient(135deg, #064e3b 0%, #047857 100%); border-radius: 20px; box-shadow: 0 10px 20px rgba(6, 78, 59, 0.3); margin-bottom: 1rem; border: 2px solid #fbbf24;">
-          <img src="/static/images/logo-walisongo.svg" alt="Logo Walisongo" style="width: 44px; height: 44px; object-fit: contain;">
+      <!-- Logo & Title -->
+      <div style="text-align: center; margin-bottom: 1.75rem;">
+        <div class="brand-crest">
+          <img src="/static/images/logo-walisongo.svg" alt="Logo Walisongo">
         </div>
-        <div style="display: inline-block; background: rgba(6, 78, 59, 0.08); color: #064e3b; font-size: 0.75rem; font-weight: 800; padding: 0.25rem 0.85rem; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; border: 1px solid rgba(6, 78, 59, 0.15);">
-          SISTEM KEAMANAN TERPADU
+        <div>
+          <span class="security-badge">
+            🔒 SISTEM OTORISASI AMAN • SHA-256 & HMAC
+          </span>
         </div>
-        <h2 style="font-size: 1.5rem; font-weight: 800; color: #0f172a; margin: 0 0 0.4rem 0;">
+        <h1 style="font-size: 1.45rem; font-weight: 800; color: #0f172a; margin-bottom: 0.25rem;">
           Portal Masuk Petugas
-        </h2>
-        <p style="font-size: 0.875rem; color: #64748b; margin: 0;">
-          Silakan masukkan kredensial akun Master atau Admin Anda
+        </h1>
+        <p style="font-size: 0.825rem; color: #64748b;">
+          {{ school.nama }}
         </p>
       </div>
 
       <!-- Alert Box -->
-      <div id="loginAlert" style="display: none; padding: 0.85rem 1rem; border-radius: 12px; font-size: 0.85rem; margin-bottom: 1.5rem; animation: fadeIn 0.3s ease;"></div>
+      <div id="loginAlert" class="alert-box"></div>
 
-      <!-- Quick Demo Account Auto-Fill Selector -->
-      <div style="background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 14px; padding: 1rem; margin-bottom: 1.75rem;">
-        <div style="font-size: 0.75rem; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.35rem;">
-          <span>⚡</span> Klik Cepat untuk Mengisi Kredensial Akun:
+      <!-- Quick Fill Credentials Box -->
+      <div class="quick-selector">
+        <div style="font-size: 0.72rem; font-weight: 700; color: #475569; text-transform: uppercase; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.35rem;">
+          <span>⚡</span> Klik untuk Isi Otomatis Kredensial:
         </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-          <button type="button" onclick="autoFill('master')" style="background: #ffffff; border: 1px solid #fcd34d; border-radius: 10px; padding: 0.6rem 0.5rem; text-align: left; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#f59e0b'; this.style.boxShadow='0 2px 8px rgba(245,158,11,0.15)';" onmouseout="this.style.borderColor='#fcd34d'; this.style.boxShadow='none';">
-            <div style="font-size: 0.8rem; font-weight: 800; color: #92400e; display: flex; align-items: center; gap: 0.3rem;">
+          <button type="button" class="quick-btn" onclick="autoFill('master')">
+            <div style="font-size: 0.78rem; font-weight: 800; color: #b45309; display: flex; align-items: center; gap: 0.25rem;">
               👑 Akun Master
             </div>
-            <div style="font-size: 0.7rem; color: #64748b; margin-top: 2px;">
-              Super Admin / Kepsek
+            <div style="font-size: 0.68rem; color: #64748b; margin-top: 2px;">
+              Super Admin (Otoritas & Log)
             </div>
           </button>
 
-          <button type="button" onclick="autoFill('admin')" style="background: #ffffff; border: 1px solid #a7f3d0; border-radius: 10px; padding: 0.6rem 0.5rem; text-align: left; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#10b981'; this.style.boxShadow='0 2px 8px rgba(16,185,129,0.15)';" onmouseout="this.style.borderColor='#a7f3d0'; this.style.boxShadow='none';">
-            <div style="font-size: 0.8rem; font-weight: 800; color: #065f46; display: flex; align-items: center; gap: 0.3rem;">
+          <button type="button" class="quick-btn" onclick="autoFill('admin')">
+            <div style="font-size: 0.78rem; font-weight: 800; color: #065f46; display: flex; align-items: center; gap: 0.25rem;">
               🛡️ Akun Admin
             </div>
-            <div style="font-size: 0.7rem; color: #64748b; margin-top: 2px;">
-              Staf TU & Panitia PPDB
+            <div style="font-size: 0.68rem; color: #64748b; margin-top: 2px;">
+              Staf TU & CMS Sekolah
             </div>
           </button>
         </div>
@@ -63,187 +353,181 @@
       <form id="loginForm" onsubmit="handleLoginSubmit(event)">
         
         <!-- Username -->
-        <div class="form-group" style="margin-bottom: 1.25rem;">
-          <label class="form-label" style="font-size: 0.85rem; font-weight: 700; color: #334155; margin-bottom: 0.4rem; display: block;">
-            Nama Pengguna (Username)
-          </label>
-          <div style="position: relative;">
-            <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 1.1rem; pointer-events: none;">👤</span>
-            <input type="text" id="usernameInput" name="username" class="form-input" style="padding-left: 2.75rem;" placeholder="Ketik 'master' atau 'admin'" required autocomplete="username">
+        <div class="form-group">
+          <label class="form-label">Nama Pengguna (Username)</label>
+          <div class="input-wrapper">
+            <span class="input-icon">👤</span>
+            <input type="text" id="usernameInput" name="username" class="form-input" placeholder="Ketik 'master' atau 'admin'" required autocomplete="username" spellcheck="false">
           </div>
         </div>
 
         <!-- Password -->
-        <div class="form-group" style="margin-bottom: 1.25rem;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
-            <label class="form-label" style="font-size: 0.85rem; font-weight: 700; color: #334155; margin-bottom: 0;">
-              Kata Sandi (Password)
-            </label>
-            <span id="rolePreviewBadge" style="display: none; font-size: 0.7rem; font-weight: 800; padding: 0.15rem 0.5rem; border-radius: 999px;"></span>
-          </div>
-          <div style="position: relative;">
-            <span style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 1.1rem; pointer-events: none;">🔒</span>
-            <input type="password" id="passwordInput" name="password" class="form-input" style="padding-left: 2.75rem; padding-right: 2.75rem;" placeholder="Masukkan kata sandi..." required autocomplete="current-password">
-            <button type="button" onclick="togglePasswordVisibility()" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #64748b; font-size: 1rem; padding: 0.25rem;">
+        <div class="form-group">
+          <label class="form-label">Kata Sandi (Password)</label>
+          <div class="input-wrapper">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="passwordInput" name="password" class="form-input" style="padding-right: 2.75rem;" placeholder="Masukkan kata sandi..." required autocomplete="current-password">
+            <button type="button" class="btn-toggle-pass" onclick="togglePasswordVisibility()" title="Lihat/Sembunyikan Sandi">
               <span id="togglePassIcon">👁️</span>
             </button>
           </div>
         </div>
 
-        <!-- Remember & Forgot -->
+        <!-- Remember Me Checkbox -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; font-size: 0.8rem;">
           <label style="display: flex; align-items: center; gap: 0.4rem; color: #475569; cursor: pointer; user-select: none;">
             <input type="checkbox" id="rememberMe" checked style="accent-color: #064e3b; width: 16px; height: 16px;">
-            Ingat saya di perangkat ini
+            Ingat sesi di perangkat ini
           </label>
-          <a href="https://wa.me/{{ school.whatsapp.replace(' ', '').replace('+', '').replace('-', '') }}?text=Halo%20Admin%20IT%20Walisongo,%20saya%20membutuhkan%20bantuan%20reset%20kata%20sandi%20portal%20sekolah." target="_blank" style="color: #059669; font-weight: 600; text-decoration: none;">
+          <a href="https://wa.me/{{ school.whatsapp.replace(' ', '').replace('+', '').replace('-', '') }}?text=Halo%20Admin%20IT,%20saya%20memerlukan%20bantuan%20akses%20portal%20sekolah." target="_blank" style="color: #059669; font-weight: 700; text-decoration: none;">
             Bantuan Akses?
           </a>
         </div>
 
         <!-- Submit Button -->
-        <button type="submit" id="btnSubmitLogin" class="btn-primary-hero" style="width: 100%; justify-content: center; padding: 0.85rem; font-size: 1rem; font-weight: 700; border-radius: 12px; box-shadow: 0 10px 25px rgba(6, 78, 59, 0.25);">
-          <span id="btnSubmitText">Masuk ke Dashboard CMS ➔</span>
-          <span id="btnSubmitSpinner" style="display: none;">Memverifikasi Akun...</span>
+        <button type="submit" id="btnSubmitLogin" class="btn-login">
+          <span id="btnSubmitText">Masuk ke Sistem Otoritas ➔</span>
+          <span id="btnSubmitSpinner" style="display: none;">Memvalidasi Kredensial...</span>
         </button>
-      </form>
 
-      <!-- Footer Info -->
-      <div style="text-align: center; margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid #f1f5f9; font-size: 0.8rem; color: #64748b;">
-        <a href="/" style="color: #064e3b; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
-          ← Kembali ke Halaman Utama Sekolah
-        </a>
-      </div>
+      </form>
 
     </div>
 
-    <!-- Security footnote -->
-    <div style="text-align: center; margin-top: 1.25rem; color: #94a3b8; font-size: 0.75rem;">
-      🛡️ Akses terproteksi token sesi HMAC & enkripsi SHA-256 • {{ school.nama }}
+    <!-- Clean Back Navigation -->
+    <div style="text-align: center;">
+      <a href="/" class="back-link">
+        ← Kembali ke Website Utama SMP Islam Walisongo 2
+      </a>
+      <div class="security-footer">
+        Akses terlindungi protokol HMAC-SHA256 • IP dicatat untuk audit keamanan<br>
+        © 2026 SMP Islam Walisongo 2 Depok
+      </div>
     </div>
 
   </div>
-</section>
 
-<script>
-function autoFill(type) {
-  const userInp = document.getElementById('usernameInput');
-  const passInp = document.getElementById('passwordInput');
-  const alertBox = document.getElementById('loginAlert');
+  <script>
+    function autoFill(type) {
+      const userInp = document.getElementById('usernameInput');
+      const passInp = document.getElementById('passwordInput');
 
-  if (type === 'master') {
-    userInp.value = 'master';
-    passInp.value = 'MasterWalisongo2026!';
-    showAlert('Kredensial Akun Master (Super Admin) berhasil diisikan otomatis. Silakan klik Masuk.', 'info');
-  } else if (type === 'admin') {
-    userInp.value = 'admin';
-    passInp.value = 'AdminWalisongo2026!';
-    showAlert('Kredensial Akun Admin (Staf TU) berhasil diisikan otomatis. Silakan klik Masuk.', 'info');
-  }
-
-  userInp.focus();
-}
-
-function togglePasswordVisibility() {
-  const passInp = document.getElementById('passwordInput');
-  const icon = document.getElementById('togglePassIcon');
-  if (passInp.type === 'password') {
-    passInp.type = 'text';
-    icon.textContent = '🙈';
-  } else {
-    passInp.type = 'password';
-    icon.textContent = '👁️';
-  }
-}
-
-function showAlert(message, type = 'error') {
-  const alertBox = document.getElementById('loginAlert');
-  alertBox.style.display = 'block';
-  
-  if (type === 'error') {
-    alertBox.style.background = '#fef2f2';
-    alertBox.style.border = '1px solid #fecaca';
-    alertBox.style.color = '#991b1b';
-    alertBox.innerHTML = `⚠️ <strong>Gagal Masuk:</strong> ${message}`;
-  } else if (type === 'success') {
-    alertBox.style.background = '#f0fdf4';
-    alertBox.style.border = '1px solid #bbf7d0';
-    alertBox.style.color = '#166534';
-    alertBox.innerHTML = `✅ <strong>Berhasil:</strong> ${message}`;
-  } else if (type === 'info') {
-    alertBox.style.background = '#eff6ff';
-    alertBox.style.border = '1px solid #bfdbfe';
-    alertBox.style.color = '#1e40af';
-    alertBox.innerHTML = `💡 ${message}`;
-  }
-}
-
-async function handleLoginSubmit(event) {
-  event.preventDefault();
-
-  const userInp = document.getElementById('usernameInput');
-  const passInp = document.getElementById('passwordInput');
-  const btn = document.getElementById('btnSubmitLogin');
-  const btnText = document.getElementById('btnSubmitText');
-  const btnSpinner = document.getElementById('btnSubmitSpinner');
-
-  const username = userInp.value.trim();
-  const password = passInp.value;
-
-  if (!username || !password) {
-    showAlert('Mohon isi nama pengguna dan kata sandi!');
-    return;
-  }
-
-  // Set loading state
-  btn.disabled = true;
-  btn.style.opacity = '0.75';
-  btnText.style.display = 'none';
-  btnSpinner.style.display = 'inline-block';
-
-  try {
-    const formData = new FormData();
-    formData.append('username', username);
-    formData.append('password', password);
-
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      body: formData
-    });
-
-    const data = await res.json();
-
-    if (res.ok && data.status === 'success') {
-      showAlert(`Selamat datang, ${data.user.nama_lengkap}! Mengalihkan ke dashboard...`, 'success');
-      setTimeout(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const redirectTo = urlParams.get('redirect') || '/admin';
-        window.location.href = redirectTo;
-      }, 700);
-    } else {
-      showAlert(data.detail || 'Nama pengguna atau kata sandi tidak valid. Silakan coba kembali.');
-      btn.disabled = false;
-      btn.style.opacity = '1';
-      btnText.style.display = 'inline-block';
-      btnSpinner.style.display = 'none';
+      if (type === 'master') {
+        userInp.value = 'master';
+        passInp.value = 'MasterWalisongo2026!';
+        showAlert('Kredensial Akun Master (Super Admin: Pengelolaan Role & Audit Log) terisi.', 'info');
+      } else if (type === 'admin') {
+        userInp.value = 'admin';
+        passInp.value = 'AdminWalisongo2026!';
+        showAlert('Kredensial Akun Admin (Staf TU: CMS & PPDB Sekolah) terisi.', 'info');
+      }
+      userInp.focus();
     }
-  } catch (err) {
-    showAlert('Terjadi kendala jaringan saat menghubungkan ke server. Silakan muat ulang halaman.');
-    btn.disabled = false;
-    btn.style.opacity = '1';
-    btnText.style.display = 'inline-block';
-    btnSpinner.style.display = 'none';
-  }
-}
 
-// Check notice query param on load
-document.addEventListener('DOMContentLoaded', () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('notice') === 'silakan_login') {
-    showAlert('Sesi Anda memerlukan login. Silakan masukkan akun Master atau Admin untuk mengakses Portal CMS.', 'info');
-  } else if (urlParams.get('notice') === 'logged_out') {
-    showAlert('Anda telah berhasil keluar (logout) dari sistem.', 'info');
-  }
-});
-</script>
-{% endblock %}
+    function togglePasswordVisibility() {
+      const passInp = document.getElementById('passwordInput');
+      const icon = document.getElementById('togglePassIcon');
+      if (passInp.type === 'password') {
+        passInp.type = 'text';
+        icon.textContent = '🙈';
+      } else {
+        passInp.type = 'password';
+        icon.textContent = '👁️';
+      }
+    }
+
+    function showAlert(message, type = 'error') {
+      const alertBox = document.getElementById('loginAlert');
+      alertBox.style.display = 'block';
+
+      if (type === 'error') {
+        alertBox.style.background = '#fef2f2';
+        alertBox.style.border = '1px solid #fecaca';
+        alertBox.style.color = '#991b1b';
+        alertBox.innerHTML = `⚠️ <strong>Akses Ditolak:</strong> ${message}`;
+      } else if (type === 'success') {
+        alertBox.style.background = '#f0fdf4';
+        alertBox.style.border = '1px solid #bbf7d0';
+        alertBox.style.color = '#166534';
+        alertBox.innerHTML = `✅ <strong>Berhasil:</strong> ${message}`;
+      } else if (type === 'info') {
+        alertBox.style.background = '#eff6ff';
+        alertBox.style.border = '1px solid #bfdbfe';
+        alertBox.style.color = '#1e40af';
+        alertBox.innerHTML = `💡 ${message}`;
+      }
+    }
+
+    async function handleLoginSubmit(event) {
+      event.preventDefault();
+
+      const userInp = document.getElementById('usernameInput');
+      const passInp = document.getElementById('passwordInput');
+      const btn = document.getElementById('btnSubmitLogin');
+      const btnText = document.getElementById('btnSubmitText');
+      const btnSpinner = document.getElementById('btnSubmitSpinner');
+
+      const username = userInp.value.trim();
+      const password = passInp.value;
+
+      if (!username || !password) {
+        showAlert('Nama pengguna dan kata sandi wajib diisi!');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.style.opacity = '0.75';
+      btnText.style.display = 'none';
+      btnSpinner.style.display = 'inline-block';
+
+      try {
+        const formData = new FormData();
+        formData.append('username', username);
+        formData.append('password', password);
+
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.status === 'success') {
+          showAlert(`Autentikasi terverifikasi. Selamat datang, ${data.user.nama_lengkap}!`, 'success');
+          setTimeout(() => {
+            // Master goes to /admin/master, Admin goes to /admin (CMS)
+            if (data.user.role === 'master') {
+              window.location.href = '/admin/master';
+            } else {
+              window.location.href = '/admin';
+            }
+          }, 600);
+        } else {
+          showAlert(data.detail || 'Nama pengguna atau kata sandi tidak valid. Silakan coba kembali.');
+          btn.disabled = false;
+          btn.style.opacity = '1';
+          btnText.style.display = 'inline-block';
+          btnSpinner.style.display = 'none';
+        }
+      } catch (err) {
+        showAlert('Koneksi ke server terputus. Mohon periksa jaringan Anda.');
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btnText.style.display = 'inline-block';
+        btnSpinner.style.display = 'none';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('notice') === 'silakan_login') {
+        showAlert('Sesi autentikasi diperlukan. Silakan masuk untuk mengakses panel.', 'info');
+      } else if (urlParams.get('notice') === 'logged_out') {
+        showAlert('Sesi Anda telah aman diakhiri (Logged out).', 'info');
+      } else if (urlParams.get('notice') === 'unauthorized_master') {
+        showAlert('Akses ditolak: Anda harus memiliki hak akses Master Administrator untuk halaman tersebut.', 'error');
+      }
+    });
+  </script>
+</body>
+</html>

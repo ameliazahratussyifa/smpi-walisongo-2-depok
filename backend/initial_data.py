@@ -328,6 +328,20 @@ Majelis Khotmil Qur'an kali ini dipimpin oleh Asatidz Pengasuh Tahfidz sebagai i
         VALUES (?, ?, ?, ?, ?, ?)
         """, default_users)
 
+    # 8. Seed Initial Audit Logs
+    cursor.execute("SELECT COUNT(*) FROM system_logs")
+    if cursor.fetchone()[0] == 0:
+        initial_logs = [
+            ("system", "SYSTEM_INIT", "Sistem portal web dan database SMP Islam Walisongo 2 Depok berhasil diinisialisasi.", "127.0.0.1"),
+            ("master", "USER_SEED", "Akun Master Administrator (@master) dan Akun Admin (@admin) berhasil disiapkan.", "127.0.0.1"),
+            ("system", "SECURITY_ACTIVE", "Lapisan keamanan sesi HMAC-SHA256 dan proteksi rute diaktifkan.", "127.0.0.1"),
+            ("master", "LOGIN_SUCCESS", "Otentikasi login awal akun Master berhasil diverifikasi.", "127.0.0.1")
+        ]
+        cursor.executemany("""
+        INSERT INTO system_logs (username, action, detail, ip_address)
+        VALUES (?, ?, ?, ?)
+        """, initial_logs)
+
     conn.commit()
     conn.close()
 
