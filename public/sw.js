@@ -1,5 +1,5 @@
-// Service Worker for SMP Islam Walisongo 2 Depok
-const CACHE_NAME = 'smpi-walisongo2-v1';
+// Service Worker for SMP Islam Walisongo 2 Depok (PWA / WebAPK Engine)
+const CACHE_NAME = 'smpi-walisongo2-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/mobile',
@@ -11,7 +11,9 @@ const ASSETS_TO_CACHE = [
   '/static/js/app.js',
   '/static/js/ppdb.js',
   '/static/js/chat-ai.js',
-  '/static/images/logo-walisongo.svg'
+  '/static/images/logo-sekolah.png',
+  '/static/images/icon-192.png',
+  '/static/images/icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -37,20 +39,14 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  // Network first, fallback to cache
-  if (event.request.method === 'GET') {
-    event.respondWith(
-      fetch(event.request)
-        .then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            const responseClone = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(event.request, responseClone);
-            });
-          }
-          return networkResponse;
-        })
-        .catch(() => caches.match(event.request))
-    );
-  }
+  if (event.request.method !== 'GET') return;
+  event.respondWith(
+    fetch(event.request)
+      .then((networkResponse) => {
+        return networkResponse;
+      })
+      .catch(() => {
+        return caches.match(event.request);
+      })
+  );
 });

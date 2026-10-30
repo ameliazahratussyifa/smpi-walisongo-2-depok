@@ -22,8 +22,10 @@ function installPwaApp() {
       }
       deferredPrompt = null;
     });
+  } else if (typeof openModal === 'function' && document.getElementById('modalDownloadApk')) {
+    openModal('modalDownloadApk');
   } else {
-    alert('Aplikasi siap di-install melalui menu browser Anda ("Tambahkan ke Layar Utama" / "Add to Home Screen").');
+    alert('Aplikasi siap di-install melalui menu browser Anda ("Instal Aplikasi" / "Tambahkan ke Layar Utama").');
   }
 }
 

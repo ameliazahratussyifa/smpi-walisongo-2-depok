@@ -199,6 +199,7 @@ async def home_page(request: Request):
     )
 
 @app.get("/mobile", response_class=HTMLResponse)
+@app.get("/app", response_class=HTMLResponse)
 async def mobile_app_view(request: Request):
     """Dedicated Mobile App Interface / PWA Native Simulation View."""
     conn = get_db_connection()

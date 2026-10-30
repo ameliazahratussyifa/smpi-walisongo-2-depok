@@ -15,13 +15,13 @@
 </head>
 <body class="mobile-app-body">
 
-  <!-- PWA Install Prompt Banner -->
+  <!-- PWA & APK Download Prompt Banner -->
   <div id="mobilePwaBanner" class="mobile-pwa-banner" style="display:flex;">
     <div style="display:flex; align-items:center; gap:0.5rem;">
-      <span>📱</span>
-      <span>Pasang Aplikasi Walisongo 2 di Ponsel</span>
+      <span style="font-size:1.15rem;">📲</span>
+      <span><strong>Unduh Aplikasi Android (APK)</strong></span>
     </div>
-    <button onclick="installPwaApp()" class="btn-install-pwa">Install</button>
+    <button onclick="openModal('modalDownloadApk')" class="btn-install-pwa">Pasang / Unduh APK ➔</button>
   </div>
 
   <!-- Mobile App Header Bar -->
@@ -443,6 +443,60 @@
     </div>
   </div>
 
+  <!-- Modal Download & Install APK Android -->
+  <div id="modalDownloadApk" class="modal-backdrop">
+    <div class="modal-window" style="max-width: 480px;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #064e3b, #022c22); color: #fff;">
+        <h3 class="modal-header-title" style="color:#fff; display:flex; align-items:center; gap:0.5rem; font-size:1.05rem;">
+          <img src="/static/images/icon-192.png" style="width:26px; height:26px; border-radius:6px;" alt="Icon">
+          Unduh & Pasang Aplikasi (APK)
+        </h3>
+        <button class="btn-close-modal" style="color:#fff;">&times;</button>
+      </div>
+      <div class="modal-body" style="padding: 1.5rem;">
+        <div style="text-align:center; margin-bottom:1.5rem;">
+          <img src="/static/images/logo-sekolah.png" style="width:75px; height:75px; object-fit:contain; margin-bottom:0.75rem;" alt="Logo">
+          <h4 style="font-size:1.15rem; font-weight:800; color:#0f172a; margin:0 0 0.25rem 0;">SMPI Walisongo 2 Mobile</h4>
+          <p style="font-size:0.8rem; color:#64748b; margin:0;">Versi 2.0.0 • Kompatibel Android & iOS • Ringan & Bebas Iklan</p>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:0.85rem; margin-bottom:1.5rem;">
+          <!-- Opsi 1: Pasang Otomatis Google WebAPK -->
+          <div style="border:2px solid #059669; background:#ecfdf5; border-radius:14px; padding:1rem; cursor:pointer;" onclick="installPwaApp()">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.4rem;">
+              <span style="font-weight:800; color:#064e3b; font-size:0.95rem;">⚡ 1. Pasang Langsung ke HP (WebAPK)</span>
+              <span style="background:#059669; color:#fff; font-size:0.65rem; font-weight:800; padding:0.15rem 0.5rem; border-radius:999px;">INSTAN</span>
+            </div>
+            <p style="font-size:0.775rem; color:#047857; margin:0 0 0.6rem 0; line-height:1.4;">
+              Aplikasi langsung terpasang di layar utama HP Anda dengan ikon resmi sekolah tanpa perlu ekstrak file manual.
+            </p>
+            <button class="btn-primary-hero" style="width:100%; justify-content:center; padding:0.55rem; font-size:0.85rem;">
+              Pasang Aplikasi Sekarang ➔
+            </button>
+          </div>
+
+          <!-- Opsi 2: Download Panduan APK Android -->
+          <div style="border:1px solid #e2e8f0; background:#f8fafc; border-radius:14px; padding:1rem;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.4rem;">
+              <span style="font-weight:800; color:#1e293b; font-size:0.9rem;">📦 2. Panduan Menu Browser Android (Chrome)</span>
+            </div>
+            <p style="font-size:0.775rem; color:#64748b; margin:0; line-height:1.5;">
+              1. Buka browser <strong>Chrome</strong> di ponsel Anda.<br>
+              2. Ketuk menu <strong>titik tiga (⋮)</strong> di pojok kanan atas.<br>
+              3. Pilih <strong>"Instal Aplikasi"</strong> atau <strong>"Tambahkan ke Layar Utama"</strong>.<br>
+              4. Sistem Android otomatis membuat paket <strong>WebAPK resmi</strong> di HP Anda.
+            </p>
+          </div>
+        </div>
+
+        <div style="background:#fef3c7; border:1px solid #fde68a; border-radius:12px; padding:0.75rem; font-size:0.775rem; color:#92400e; display:flex; align-items:center; gap:0.5rem;">
+          <span>💡</span>
+          <span>Aplikasi terhubung langsung dengan server sekolah (Data PPDB, Raport & Notifikasi otomatis terbarui).</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- AI Chat Widget -->
   <div class="ai-assistant-widget" style="bottom: 74px; right: 1rem;">
     <div id="aiChatBox" class="ai-chat-box" style="width: 320px; height: 420px; bottom: 70px;">
@@ -461,8 +515,8 @@
         <button id="btnAiSend" class="btn-ai-send">➤</button>
       </div>
     </div>
-    <button id="aiChatTriggerBtn" class="ai-trigger-btn" style="width:50px; height:50px;">
-      💬
+    <button id="aiChatTriggerBtn" class="ai-trigger-btn" style="width:54px; height:54px; background:#0284c7; border:2px solid #f59e0b; color:#fff; display:flex; align-items:center; justify-content:center; border-radius:50%; box-shadow:0 6px 18px rgba(2,132,199,0.4);">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
     </button>
   </div>
 

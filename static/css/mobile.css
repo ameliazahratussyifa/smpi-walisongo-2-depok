@@ -206,32 +206,31 @@ body.mobile-app-body {
   text-align: center;
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 0.85rem 0.4rem;
+  border-radius: 16px;
+  padding: 0.95rem 0.35rem;
   cursor: pointer;
-  transition: transform 0.15s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 
 .mobile-quick-item:active {
-  transform: scale(0.96);
-  background: #f1f5f9;
+  transform: scale(0.95);
+  background: #f8fafc;
 }
 
 .mobile-quick-icon {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  background: #ecfdf5;
-  color: #047857;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 0.45rem;
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
 }
 
 .mobile-quick-label {
-  font-size: 0.7rem;
+  font-size: 0.725rem;
   font-weight: 700;
   color: #334155;
   line-height: 1.2;
