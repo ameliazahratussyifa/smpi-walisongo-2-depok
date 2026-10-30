@@ -12,6 +12,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, Redirect
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 
 # Ensure project root is in sys.path
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -65,6 +66,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# GZip Compression for superfast payload transfer (< 500 bytes overhead)
+app.add_middleware(GZipMiddleware, minimum_size=500)
+
 # Static & Templates setup
 STATIC_DIR = BASE_DIR / "static"
 TEMPLATES_DIR = BASE_DIR / "templates"
@@ -74,13 +78,14 @@ if STATIC_DIR.exists():
 
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 
-# Vercel Serverless Path Normalizer Middleware
+# Vercel Serverless Path Normalizer & Cache Optimizer Middleware
 @app.middleware("http")
 async def vercel_path_normalizer(request: Request, call_next):
     """
     On Vercel, catch-all rewrites direct traffic to /api/index.py?__path=/$1.
     This middleware restores the original requested path from the __path query parameter,
     Vercel headers, or falls back to /.
+    Also injects optimal Cache-Control headers for static assets.
     """
     target_path = None
 
@@ -108,6 +113,12 @@ async def vercel_path_normalizer(request: Request, call_next):
             request.scope["path"] = current_path[len("/api/index.py"):]
 
     response = await call_next(request)
+
+    # Performance: Enable Browser & Edge Caching for static assets (CSS, JS, SVG, Images)
+    req_path = request.scope.get("path", "")
+    if req_path.startswith("/static/") or req_path.endswith((".css", ".js", ".svg", ".png", ".jpg", ".woff2")):
+        response.headers["Cache-Control"] = "public, max-age=86400, stale-while-revalidate=604800"
+
     return response
 
 # School Profile Static Metadata
