@@ -13,24 +13,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // 1. Mobile Menu & Navbar Effects
 function initNavbar() {
-  const toggleBtn = document.querySelector('.btn-menu-toggle');
-  const navMenu = document.querySelector('.nav-menu');
+  const toggleBtn = document.getElementById('btnMenuToggle') || document.querySelector('.btn-menu-toggle');
+  const navMenu = document.getElementById('mainNavMenu') || document.querySelector('.nav-menu');
 
   if (toggleBtn && navMenu) {
-    toggleBtn.addEventListener('click', () => {
-      navMenu.classList.toggle('mobile-open');
-      if (navMenu.classList.contains('mobile-open')) {
-        navMenu.style.display = 'flex';
-        navMenu.style.flexDirection = 'column';
-        navMenu.style.position = 'absolute';
-        navMenu.style.top = '80px';
-        navMenu.style.left = '0';
-        navMenu.style.right = '0';
-        navMenu.style.background = '#ffffff';
-        navMenu.style.padding = '1.5rem';
-        navMenu.style.boxShadow = '0 10px 25px rgba(0,0,0,0.1)';
-      } else {
-        navMenu.style.display = '';
+    toggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = navMenu.classList.toggle('mobile-open');
+      toggleBtn.classList.toggle('active', isOpen);
+      toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      document.body.style.overflow = isOpen ? 'hidden' : '';
+    });
+
+    // Close mobile menu when clicking any link inside
+    navMenu.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navMenu.classList.remove('mobile-open');
+        toggleBtn.classList.remove('active');
+        toggleBtn.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      });
+    });
+
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+      if (navMenu.classList.contains('mobile-open') && !navMenu.contains(e.target) && !toggleBtn.contains(e.target)) {
+        navMenu.classList.remove('mobile-open');
+        toggleBtn.classList.remove('active');
+        toggleBtn.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
       }
     });
   }
@@ -39,7 +50,7 @@ function initNavbar() {
   window.addEventListener('scroll', () => {
     const nav = document.querySelector('.main-nav');
     if (nav) {
-      if (window.scrollY > 40) {
+      if (window.scrollY > 30) {
         nav.classList.add('scrolled');
       } else {
         nav.classList.remove('scrolled');

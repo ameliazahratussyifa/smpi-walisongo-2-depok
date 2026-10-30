@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Portal Masuk Terproteksi - {{ school.nama }}</title>
   <meta name="robots" content="noindex, nofollow">
-  <meta name="theme-color" content="#022c22">
+  <meta name="theme-color" content="#0284c7">
 
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/static/images/logo-walisongo.svg">
@@ -25,7 +25,7 @@
     body {
       font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       min-height: 100vh;
-      background: radial-gradient(circle at 50% 20%, #064e3b 0%, #022c22 45%, #030712 100%);
+      background: radial-gradient(circle at 50% 20%, #0369a1 0%, #0c4a6e 45%, #082f49 100%);
       color: #0f172a;
       display: flex;
       flex-direction: column;
@@ -41,9 +41,9 @@
       position: fixed;
       inset: 0;
       background-image: 
-        radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 70%),
-        linear-gradient(rgba(16, 185, 129, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(16, 185, 129, 0.04) 1px, transparent 1px);
+        radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.12) 0%, transparent 70%),
+        linear-gradient(rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
       background-size: 100% 100%, 36px 36px, 36px 36px;
       pointer-events: none;
       z-index: 1;
@@ -56,7 +56,7 @@
       transform: translateX(-50%);
       width: 600px;
       height: 600px;
-      background: radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, transparent 70%);
       border-radius: 50%;
       pointer-events: none;
       z-index: 1;
@@ -68,7 +68,7 @@
       right: 5%;
       width: 500px;
       height: 500px;
-      background: radial-gradient(circle, rgba(245, 158, 11, 0.07) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 70%);
       border-radius: 50%;
       pointer-events: none;
       z-index: 1;
@@ -178,8 +178,8 @@
     }
 
     .form-input:focus {
-      border-color: #059669;
-      box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+      border-color: #0284c7;
+      box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.2);
     }
 
     .btn-toggle-pass {
@@ -200,7 +200,7 @@
     .btn-login {
       width: 100%;
       height: 50px;
-      background: linear-gradient(135deg, #059669 0%, #064e3b 100%);
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
       color: #ffffff;
       border: none;
       border-radius: 14px;
@@ -208,7 +208,7 @@
       font-weight: 800;
       letter-spacing: 0.02em;
       cursor: pointer;
-      box-shadow: 0 10px 25px rgba(6, 78, 59, 0.35);
+      box-shadow: 0 10px 25px rgba(2, 132, 199, 0.35);
       transition: all 0.25s ease;
       display: flex;
       align-items: center;
@@ -218,8 +218,8 @@
 
     .btn-login:hover {
       transform: translateY(-2px);
-      box-shadow: 0 14px 30px rgba(6, 78, 59, 0.45);
-      background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+      box-shadow: 0 14px 30px rgba(2, 132, 199, 0.45);
+      background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
     }
 
     .btn-login:active {
@@ -228,8 +228,8 @@
 
     /* Quick Demo Account Selector */
     .quick-selector {
-      background: #f8fafc;
-      border: 1px dashed #cbd5e1;
+      background: #f0f9ff;
+      border: 1px dashed #bae6fd;
       border-radius: 14px;
       padding: 0.9rem;
       margin-bottom: 1.5rem;
@@ -246,8 +246,8 @@
     }
 
     .quick-btn:hover {
-      border-color: #059669;
-      box-shadow: 0 2px 8px rgba(5, 150, 105, 0.15);
+      border-color: #0284c7;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.15);
     }
 
     .alert-box {

@@ -5,15 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}{{ school.nama }} - Beriman, Cerdas, dan Berakhlakul Karimah{% endblock %}</title>
   <meta name="description" content="Website Resmi {{ school.nama }}. Sekolah Menengah Pertama Islam Berakreditasi A di Cilodong Depok, naungan Yayasan Pondok Pesantren Hj. Dardjah Amin. PPDB Online 2026/2027.">
-  <meta name="theme-color" content="#064e3b">
+  <meta name="theme-color" content="#0284c7">
 
   <!-- Favicon & PWA -->
   <link rel="icon" type="image/svg+xml" href="/static/images/logo-walisongo.svg">
   <link rel="apple-touch-icon" href="/static/images/logo-walisongo.svg">
   <link rel="manifest" href="/manifest.json">
 
-  <!-- Core Stylesheet -->
+  <!-- Core Desktop Stylesheet -->
   <link rel="stylesheet" href="/static/css/style.css">
+  <!-- Dedicated Mobile & Tablet Responsive Stylesheet (Isolated) -->
+  <link rel="stylesheet" href="/static/css/responsive.css">
   {% block extra_css %}{% endblock %}
 </head>
 <body>
