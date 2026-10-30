@@ -1,137 +1,351 @@
 {% extends "base.html" %}
 
-{% block title %}Portal CMS Admin - {{ school.nama }}{% endblock %}
+{% block title %}Portal CMS & Manajemen - {{ school.nama }}{% endblock %}
 
 {% block content %}
-<section style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 3rem 0;">
+<!-- HEADER DASHBOARD WITH USER PROFILE -->
+<section style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 2.5rem 0; border-bottom: 3px solid #059669;">
   <div class="container">
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+      
+      <!-- School & Dashboard Title -->
       <div>
-        <span class="hero-pill-badge" style="background:rgba(245,158,11,0.2); border-color:#f59e0b; color:#fbbf24;">
-          SISTEM INFORMASI MANAJEMEN SEKOLAH
-        </span>
-        <h1 style="font-size:2rem; font-weight:800; margin-top:0.5rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+          <span class="hero-pill-badge" style="background: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #34d399; margin: 0;">
+            SISTEM INFORMASI MANAJEMEN SEKOLAH
+          </span>
+          {% if user and user.role == 'master' %}
+          <span style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #ffffff; font-weight: 800; font-size: 0.7rem; padding: 0.2rem 0.65rem; border-radius: 999px; letter-spacing: 0.05em; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);">
+            👑 HAK AKSES MASTER (SUPER ADMIN)
+          </span>
+          {% else %}
+          <span style="background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; color: #6ee7b7; font-weight: 800; font-size: 0.7rem; padding: 0.2rem 0.65rem; border-radius: 999px;">
+            🛡️ HAK AKSES ADMIN STAF
+          </span>
+          {% endif %}
+        </div>
+        <h1 style="font-size: 1.85rem; font-weight: 800; margin: 0 0 0.25rem 0;">
           Portal CMS & Admin Dashboard
         </h1>
-        <p style="font-size:0.875rem; color:#94a3b8;">{{ school.nama }} • Yayasan PP. Hj. Dardjah Amin</p>
+        <p style="font-size: 0.85rem; color: #94a3b8; margin: 0;">
+          {{ school.nama }} • Yayasan PP. Hj. Dardjah Amin
+        </p>
       </div>
 
-      <div style="display:flex; gap:0.75rem;">
-        <button onclick="refreshAdminData()" class="btn-primary-hero" style="font-size:0.85rem; padding:0.55rem 1rem;">
+      <!-- Logged-in User Profile & Action Controls -->
+      <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        
+        <!-- User Badge Box -->
+        <div style="background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 14px; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.75rem;">
+          <div style="width: 38px; height: 38px; border-radius: 50%; background: {% if user and user.role == 'master' %}linear-gradient(135deg, #f59e0b, #b45309){% else %}linear-gradient(135deg, #059669, #064e3b){% endif %}; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; color: #ffffff; border: 2px solid {% if user and user.role == 'master' %}#fbbf24{% else %}#34d399{% endif %};">
+            {% if user and user.role == 'master' %}M{% else %}A{% endif %}
+          </div>
+          <div>
+            <div style="font-size: 0.85rem; font-weight: 800; color: #ffffff; line-height: 1.2;">
+              {{ user.nama_lengkap if user else 'Administrator' }}
+            </div>
+            <div style="font-size: 0.7rem; color: #94a3b8;">
+              @{{ user.username if user else 'admin' }} • <span style="color: {% if user and user.role == 'master' %}#fbbf24{% else %}#6ee7b7{% endif %}; font-weight: 700;">{{ user.role.upper() if user else 'ADMIN' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <button onclick="refreshAdminData()" class="btn-primary-hero" style="font-size: 0.85rem; padding: 0.55rem 0.95rem;">
           🔄 Perbarui Data
         </button>
-        <a href="/" class="btn-secondary-hero" style="font-size:0.85rem; padding:0.55rem 1rem;">
-          Lihat Web Utama
+        <a href="/" class="btn-secondary-hero" style="font-size: 0.85rem; padding: 0.55rem 0.95rem;">
+          🌐 Web Utama
         </a>
+        <a href="/logout" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; font-size: 0.85rem; padding: 0.55rem 0.95rem; border-radius: 10px; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(239, 68, 68, 0.3)';" onmouseout="this.style.background='rgba(239, 68, 68, 0.15)';">
+          🚪 Keluar
+        </a>
+
       </div>
     </div>
   </div>
 </section>
 
-<div class="container" style="padding: 3rem 1.5rem;">
+<div class="container" style="padding: 2.5rem 1.5rem;">
+  
+  <!-- Role Notice Banner -->
+  {% if user and user.role == 'master' %}
+  <div style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 16px; padding: 1rem 1.25rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    <div style="display: flex; align-items: center; gap: 0.75rem;">
+      <span style="font-size: 1.5rem;">👑</span>
+      <div>
+        <h4 style="font-size: 0.95rem; font-weight: 800; color: #92400e; margin: 0;">Mode Master Administrator Aktif</h4>
+        <p style="font-size: 0.8rem; color: #b45309; margin: 0;">Anda memiliki otoritas penuh: kelola akun admin, pantau PPDB real-time, kelola pendaftar, dan kontrol sistem informasi sekolah.</p>
+      </div>
+    </div>
+    <button onclick="scrollToUserManagement()" class="btn-primary-hero" style="font-size: 0.75rem; padding: 0.4rem 0.85rem; background: #b45309; border-color: #92400e;">
+      👥 Kelola Akun Pengguna ↓
+    </button>
+  </div>
+  {% else %}
+  <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 16px; padding: 1rem 1.25rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 0.75rem;">
+    <span style="font-size: 1.5rem;">🛡️</span>
+    <div>
+      <h4 style="font-size: 0.95rem; font-weight: 800; color: #065f46; margin: 0;">Mode Staf Admin TU & PPDB Aktif</h4>
+      <p style="font-size: 0.8rem; color: #047857; margin: 0;">Anda berwenang mengelola data berkas pendaftaran PPDB, mengubah status seleksi, dan membalas konsultasi calon wali murid.</p>
+    </div>
+  </div>
+  {% endif %}
+
   <!-- Stat Cards -->
-  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1.25rem; margin-bottom:2.5rem;">
-    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; padding:1.25rem; box-shadow:var(--shadow-sm);">
-      <div style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase;">Total Pendaftar PPDB</div>
-      <div id="admStatPpdb" style="font-size:2rem; font-weight:800; color:#064e3b; margin:0.25rem 0;">-</div>
-      <div style="font-size:0.75rem; color:#059669;">Data tersimpan di SQLite DB</div>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem;">
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.25rem; box-shadow: var(--shadow-sm);">
+      <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Total Pendaftar PPDB</div>
+      <div id="admStatPpdb" style="font-size: 2rem; font-weight: 800; color: #064e3b; margin: 0.25rem 0;">-</div>
+      <div style="font-size: 0.75rem; color: #059669;">Data tersimpan di Sistem</div>
     </div>
 
-    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; padding:1.25rem; box-shadow:var(--shadow-sm);">
-      <div style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase;">Pesan & Konsultasi Masuk</div>
-      <div id="admStatPesan" style="font-size:2rem; font-weight:800; color:#d97706; margin:0.25rem 0;">-</div>
-      <div id="admStatPesanBaru" style="font-size:0.75rem; color:#ea580c;">- pesan baru</div>
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.25rem; box-shadow: var(--shadow-sm);">
+      <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Pesan & Konsultasi Masuk</div>
+      <div id="admStatPesan" style="font-size: 2rem; font-weight: 800; color: #d97706; margin: 0.25rem 0;">-</div>
+      <div id="admStatPesanBaru" style="font-size: 0.75rem; color: #ea580c;">- pesan baru</div>
     </div>
 
-    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; padding:1.25rem; box-shadow:var(--shadow-sm);">
-      <div style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase;">Publikasi Berita & Agenda</div>
-      <div id="admStatBerita" style="font-size:2rem; font-weight:800; color:#2563eb; margin:0.25rem 0;">-</div>
-      <div style="font-size:0.75rem; color:#3b82f6;">Artikel aktif terbit</div>
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.25rem; box-shadow: var(--shadow-sm);">
+      <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Publikasi Berita & Agenda</div>
+      <div id="admStatBerita" style="font-size: 2rem; font-weight: 800; color: #2563eb; margin: 0.25rem 0;">-</div>
+      <div style="font-size: 0.75rem; color: #3b82f6;">Artikel aktif terbit</div>
     </div>
 
-    <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:16px; padding:1.25rem; box-shadow:var(--shadow-sm);">
-      <div style="font-size:0.75rem; font-weight:700; color:#64748b; text-transform:uppercase;">Dewan Asatidz & Guru</div>
-      <div id="admStatGuru" style="font-size:2rem; font-weight:800; color:#7c3aed; margin:0.25rem 0;">-</div>
-      <div style="font-size:0.75rem; color:#8b5cf6;">Tenaga Pendidik</div>
+    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 1.25rem; box-shadow: var(--shadow-sm);">
+      <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase;">Dewan Asatidz & Guru</div>
+      <div id="admStatGuru" style="font-size: 2rem; font-weight: 800; color: #7c3aed; margin: 0.25rem 0;">-</div>
+      <div style="font-size: 0.75rem; color: #8b5cf6;">Tenaga Pendidik</div>
     </div>
   </div>
 
   <!-- PPDB Management Table -->
-  <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:20px; padding:2rem; box-shadow:var(--shadow-sm); margin-bottom:3rem;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 2rem; box-shadow: var(--shadow-sm); margin-bottom: 3rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
       <div>
-        <h3 style="font-size:1.35rem; font-weight:800; color:#0f172a; margin:0;">📋 Data Pendaftar PPDB 2026/2027</h3>
-        <p style="font-size:0.85rem; color:#64748b; margin:0;">Kelola status berkas, nomor WhatsApp wali, dan catatan seleksi pendaftar.</p>
+        <h3 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 0;">📋 Data Pendaftar PPDB 2026/2027</h3>
+        <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Kelola status berkas, nomor WhatsApp wali, dan catatan seleksi pendaftar.</p>
       </div>
       <div>
-        <button onclick="openModal('modalPpdbRegister')" class="btn-primary-hero" style="font-size:0.8rem; padding:0.5rem 1rem;">
+        <button onclick="openModal('modalPpdbRegister')" class="btn-primary-hero" style="font-size: 0.8rem; padding: 0.5rem 1rem;">
           + Tambah Pendaftar Manual
         </button>
       </div>
     </div>
 
-    <div style="overflow-x:auto;">
-      <table style="width:100%; border-collapse:collapse; font-size:0.875rem;">
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
         <thead>
-          <tr style="background:#f8fafc; border-bottom:2px solid #e2e8f0; text-align:left; color:#475569;">
-            <th style="padding:0.75rem 1rem;">No. Registrasi</th>
-            <th style="padding:0.75rem 1rem;">Nama Calon Siswa</th>
-            <th style="padding:0.75rem 1rem;">NISN / Asal Sekolah</th>
-            <th style="padding:0.75rem 1rem;">Jalur Pendaftaran</th>
-            <th style="padding:0.75rem 1rem;">Wali / No. WA</th>
-            <th style="padding:0.75rem 1rem;">Status Seleksi</th>
-            <th style="padding:0.75rem 1rem; text-align:center;">Aksi</th>
+          <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #475569;">
+            <th style="padding: 0.85rem 1rem;">No. Registrasi</th>
+            <th style="padding: 0.85rem 1rem;">Nama Calon Siswa</th>
+            <th style="padding: 0.85rem 1rem;">NISN / Asal Sekolah</th>
+            <th style="padding: 0.85rem 1rem;">Jalur Peminatan</th>
+            <th style="padding: 0.85rem 1rem;">Wali & WhatsApp</th>
+            <th style="padding: 0.85rem 1rem;">Status Seleksi</th>
+            <th style="padding: 0.85rem 1rem; text-align: center;">Tindakan</th>
           </tr>
         </thead>
         <tbody id="admPpdbTableBody">
-          <tr><td colspan="7" style="padding:2rem; text-align:center; color:#64748b;">Memuat data...</td></tr>
+          <tr>
+            <td colspan="7" style="padding: 2rem; text-align: center; color: #64748b;">Memuat data pendaftar...</td>
+          </tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- Incoming Messages Section -->
-  <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:20px; padding:2rem; box-shadow:var(--shadow-sm);">
-    <h3 style="font-size:1.35rem; font-weight:800; color:#0f172a; margin-bottom:0.5rem;">💬 Pesan Konsultasi & Pertanyaan Masuk</h3>
-    <p style="font-size:0.85rem; color:#64748b; margin-bottom:1.5rem;">Pesan dari calon orang tua siswa melalui website dan formulir kontak.</p>
+  <!-- Incoming Messages & Inquiries -->
+  <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 2rem; box-shadow: var(--shadow-sm); margin-bottom: 3rem;">
+    <div style="margin-bottom: 1.5rem;">
+      <h3 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 0;">💬 Pesan & Konsultasi Wali Santri Masuk</h3>
+      <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Pesan yang dikirimkan masyarakat atau wali santri melalui formulir kontak website.</p>
+    </div>
 
-    <div id="admPesanList" style="display:flex; flex-direction:column; gap:1rem;">
-      <p style="color:#64748b; padding:1rem; text-align:center;">Memuat pesan...</p>
+    <div id="admPesanList" style="display: grid; gap: 1rem;">
+      <p style="color: #64748b; padding: 1rem;">Memuat daftar pesan...</p>
     </div>
   </div>
+
+  <!-- MASTER ONLY: USER MANAGEMENT SECTION -->
+  {% if user and user.role == 'master' %}
+  <div id="sectionUserManagement" style="background: #ffffff; border: 2px solid #fcd34d; border-radius: 20px; padding: 2rem; box-shadow: 0 10px 30px rgba(245, 158, 11, 0.08); margin-bottom: 3rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <div style="display: inline-flex; align-items: center; gap: 0.4rem; background: #fef3c7; color: #92400e; font-size: 0.75rem; font-weight: 800; padding: 0.2rem 0.65rem; border-radius: 999px; margin-bottom: 0.35rem;">
+          👑 KHUSUS AKUN MASTER
+        </div>
+        <h3 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin: 0;">👥 Manajemen Akun Petugas & Administrator</h3>
+        <p style="font-size: 0.85rem; color: #64748b; margin: 0;">Kelola hak akses akun Master, tambahkan staf Admin baru, dan kontrol kredensial keamanan.</p>
+      </div>
+      <div>
+        <button onclick="openModal('modalCreateUser')" class="btn-primary-hero" style="font-size: 0.8rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, #d97706, #b45309); border-color: #92400e;">
+          + Tambah Akun Petugas Baru
+        </button>
+      </div>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table style="width: 100%; border-collapse: collapse; font-size: 0.85rem; text-align: left;">
+        <thead>
+          <tr style="background: #fffbeb; border-bottom: 2px solid #fde68a; color: #78350f;">
+            <th style="padding: 0.85rem 1rem;">ID</th>
+            <th style="padding: 0.85rem 1rem;">Nama Lengkap</th>
+            <th style="padding: 0.85rem 1rem;">Username</th>
+            <th style="padding: 0.85rem 1rem;">Hak Akses (Role)</th>
+            <th style="padding: 0.85rem 1rem;">Email</th>
+            <th style="padding: 0.85rem 1rem;">Status</th>
+            <th style="padding: 0.85rem 1rem;">Terakhir Login</th>
+            <th style="padding: 0.85rem 1rem; text-align: center;">Tindakan</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if all_users %}
+            {% for u in all_users %}
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+              <td style="padding: 0.85rem 1rem; font-weight: 700; color: #64748b;">#{{ u.id }}</td>
+              <td style="padding: 0.85rem 1rem; font-weight: 700; color: #0f172a;">{{ u.nama_lengkap }}</td>
+              <td style="padding: 0.85rem 1rem; font-weight: 800; color: #064e3b;">@{{ u.username }}</td>
+              <td style="padding: 0.85rem 1rem;">
+                {% if u.role == 'master' %}
+                <span style="background: #fef3c7; color: #92400e; font-weight: 800; font-size: 0.75rem; padding: 0.2rem 0.65rem; border-radius: 999px;">👑 MASTER</span>
+                {% else %}
+                <span style="background: #ecfdf5; color: #047857; font-weight: 800; font-size: 0.75rem; padding: 0.2rem 0.65rem; border-radius: 999px;">🛡️ ADMIN</span>
+                {% endif %}
+              </td>
+              <td style="padding: 0.85rem 1rem; color: #64748b;">{{ u.email or '-' }}</td>
+              <td style="padding: 0.85rem 1rem;">
+                <span style="background: #f0fdf4; color: #166534; font-weight: 700; font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 6px;">Aktif</span>
+              </td>
+              <td style="padding: 0.85rem 1rem; color: #64748b; font-size: 0.75rem;">{{ u.last_login or 'Belum pernah' }}</td>
+              <td style="padding: 0.85rem 1rem; text-align: center;">
+                <button onclick="openResetPasswordModal({{ u.id }}, '{{ u.username }}')" class="btn-mobile-mode" style="font-size: 0.75rem; padding: 0.25rem 0.65rem;">
+                  🔑 Reset Password
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="8" style="padding: 2rem; text-align: center; color: #64748b;">Data akun pengguna tersimpan di database.</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
 </div>
 
-<!-- Modal Update Status PPDB -->
+<!-- ==================== MODAL: UPDATE STATUS PPDB ==================== -->
 <div id="modalUpdatePpdb" class="modal-backdrop">
   <div class="modal-window">
     <div class="modal-header">
-      <h3 class="modal-header-title">✏️ Perbarui Status Seleksi Calon Siswa</h3>
-      <button class="btn-close-modal">&times;</button>
+      <h3 class="modal-header-title">✏️ Perbarui Status Seleksi PPDB</h3>
+      <button class="btn-close-modal" onclick="closeModal('modalUpdatePpdb')">&times;</button>
     </div>
     <div class="modal-body">
       <form id="formUpdateStatus" onsubmit="submitStatusUpdate(event)">
         <input type="hidden" id="editPpdbId">
-        <div class="form-group">
-          <label class="form-label">Nama Siswa</label>
-          <input type="text" id="editPpdbNama" class="form-input" readonly style="background:#f1f5f9;">
+
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label class="form-label">Nama Calon Siswa</label>
+          <input type="text" id="editPpdbNama" class="form-input" readonly style="background: #f8fafc; font-weight: 700;">
         </div>
-        <div class="form-group">
-          <label class="form-label">Status Seleksi Baru *</label>
+
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label class="form-label">Status Seleksi Penerimaan *</label>
           <select id="editPpdbStatus" class="form-select" required>
-            <option value="Menunggu Verifikasi Berkas">Menunggu Verifikasi Berkas</option>
+            <option value="Menunggu Verifikasi">Menunggu Verifikasi</option>
+            <option value="Berkas Terverifikasi">Berkas Terverifikasi</option>
             <option value="Menunggu Seleksi Wawancara">Menunggu Seleksi Wawancara</option>
-            <option value="Lulus Tes Sima'an Tahfidz">Lulus Tes Sima'an Tahfidz</option>
             <option value="Diterima (Tahap 1)">Diterima (Tahap 1)</option>
-            <option value="Cadangan">Cadangan</option>
-            <option value="Tidak Memenuhi Syarat">Tidak Memenuhi Syarat</option>
+            <option value="Diterima (Jalur Beasiswa Tahfidz)">Diterima (Jalur Beasiswa Tahfidz)</option>
+            <option value="Ditolak / Belum Memenuhi Syarat">Ditolak / Belum Memenuhi Syarat</option>
           </select>
         </div>
-        <div class="form-group">
-          <label class="form-label">Catatan Panitia untuk Siswa / Wali</label>
-          <textarea id="editPpdbCatatan" rows="3" class="form-textarea" placeholder="Contoh: Jadwal wawancara hari Sabtu jam 09.00 WIB."></textarea>
+
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label class="form-label">Catatan Panitia / Jadwal Seleksi</label>
+          <textarea id="editPpdbCatatan" rows="3" class="form-textarea" placeholder="Contoh: Berkas lengkap. Tes wawancara hari Sabtu jam 09.00 WIB."></textarea>
         </div>
-        <button type="submit" class="btn-primary-hero" style="width:100%; justify-content:center; padding:0.75rem;">
-          Simpan Pembaruan Status ➔
+
+        <button type="submit" class="btn-primary-hero" style="width: 100%; justify-content: center; padding: 0.75rem;">
+          Simpan Perubahan Status
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: MASTER CREATE USER ==================== -->
+<div id="modalCreateUser" class="modal-backdrop">
+  <div class="modal-window">
+    <div class="modal-header">
+      <h3 class="modal-header-title">👥 Tambah Akun Petugas Baru</h3>
+      <button class="btn-close-modal" onclick="closeModal('modalCreateUser')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="formCreateUser" onsubmit="submitCreateUser(event)">
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label class="form-label">Nama Lengkap Petugas *</label>
+          <input type="text" id="newNamaLengkap" class="form-input" placeholder="Contoh: Ust. Rahmat Hidayat, S.Pd." required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label class="form-label">Username (Nama Pengguna) *</label>
+          <input type="text" id="newUsername" class="form-input" placeholder="Contoh: rahmat.tu" required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label class="form-label">Kata Sandi Awal * (Min. 6 Karakter)</label>
+          <input type="password" id="newPassword" class="form-input" placeholder="Masukkan kata sandi..." required>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label class="form-label">Hak Akses (Role) *</label>
+          <select id="newRole" class="form-select" required>
+            <option value="admin">Admin Staf TU & Panitia PPDB</option>
+            <option value="master">Master Administrator (Super Admin)</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label class="form-label">Email Petugas (Opsional)</label>
+          <input type="email" id="newEmail" class="form-input" placeholder="petugas@smpiwalisongo2depok.sch.id">
+        </div>
+
+        <button type="submit" class="btn-primary-hero" style="width: 100%; justify-content: center; padding: 0.75rem; background: linear-gradient(135deg, #d97706, #b45309); border-color: #92400e;">
+          Simpan Akun Pengguna
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MODAL: MASTER RESET PASSWORD ==================== -->
+<div id="modalResetPassword" class="modal-backdrop">
+  <div class="modal-window">
+    <div class="modal-header">
+      <h3 class="modal-header-title">🔑 Reset Kata Sandi Pengguna</h3>
+      <button class="btn-close-modal" onclick="closeModal('modalResetPassword')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="formResetPassword" onsubmit="submitResetPassword(event)">
+        <input type="hidden" id="resetUserId">
+        
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label class="form-label">Username Pengguna</label>
+          <input type="text" id="resetUsernameDisplay" class="form-input" readonly style="background: #f8fafc; font-weight: 700;">
+        </div>
+
+        <div class="form-group" style="margin-bottom: 1.5rem;">
+          <label class="form-label">Kata Sandi Baru * (Min. 6 Karakter)</label>
+          <input type="password" id="resetNewPassword" class="form-input" placeholder="Ketik kata sandi baru..." required>
+        </div>
+
+        <button type="submit" class="btn-primary-hero" style="width: 100%; justify-content: center; padding: 0.75rem;">
+          Simpan Kata Sandi Baru
         </button>
       </form>
     </div>
@@ -142,6 +356,11 @@
 document.addEventListener('DOMContentLoaded', () => {
   refreshAdminData();
 });
+
+function scrollToUserManagement() {
+  const el = document.getElementById('sectionUserManagement');
+  if (el) el.scrollIntoView({ behavior: 'smooth' });
+}
 
 async function refreshAdminData() {
   try {
@@ -165,7 +384,9 @@ async function refreshAdminData() {
       renderPpdbTable(dataPpdb.data);
     }
   } catch (e) {
-    showToast('Kendala memuat data dashboard', 'error');
+    if (typeof showToast === 'function') {
+      showToast('Kendala memuat data dashboard', 'error');
+    }
   }
 }
 
@@ -253,6 +474,72 @@ async function submitStatusUpdate(e) {
     }
   } catch (err) {
     showToast('Gagal memperbarui status', 'error');
+  }
+}
+
+function openResetPasswordModal(userId, username) {
+  document.getElementById('resetUserId').value = userId;
+  document.getElementById('resetUsernameDisplay').value = username;
+  document.getElementById('resetNewPassword').value = '';
+  openModal('modalResetPassword');
+}
+
+async function submitResetPassword(e) {
+  e.preventDefault();
+  const userId = document.getElementById('resetUserId').value;
+  const newPassword = document.getElementById('resetNewPassword').value;
+
+  const formData = new FormData();
+  formData.append('user_id', userId);
+  formData.append('new_password', newPassword);
+
+  try {
+    const res = await fetch('/api/admin/users/reset-password', {
+      method: 'POST',
+      body: formData
+    });
+    const result = await res.json();
+    if (res.ok && result.status === 'success') {
+      showToast(result.message, 'success');
+      closeModal('modalResetPassword');
+    } else {
+      showToast(result.detail || 'Gagal mereset kata sandi', 'error');
+    }
+  } catch (err) {
+    showToast('Terjadi kesalahan jaringan', 'error');
+  }
+}
+
+async function submitCreateUser(e) {
+  e.preventDefault();
+  const nama = document.getElementById('newNamaLengkap').value;
+  const username = document.getElementById('newUsername').value;
+  const password = document.getElementById('newPassword').value;
+  const role = document.getElementById('newRole').value;
+  const email = document.getElementById('newEmail').value;
+
+  const formData = new FormData();
+  formData.append('nama_lengkap', nama);
+  formData.append('username', username);
+  formData.append('password', password);
+  formData.append('role', role);
+  formData.append('email', email);
+
+  try {
+    const res = await fetch('/api/admin/users/create', {
+      method: 'POST',
+      body: formData
+    });
+    const result = await res.json();
+    if (res.ok && result.status === 'success') {
+      showToast(result.message, 'success');
+      closeModal('modalCreateUser');
+      setTimeout(() => window.location.reload(), 1000);
+    } else {
+      showToast(result.detail || 'Gagal membuat akun baru', 'error');
+    }
+  } catch (err) {
+    showToast('Terjadi kesalahan jaringan', 'error');
   }
 }
 </script>

@@ -8,7 +8,7 @@ import random
 import time
 from pathlib import Path
 from fastapi import FastAPI, Request, HTTPException, Form
-from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,6 +21,10 @@ if str(BASE_DIR) not in sys.path:
 from backend.database import get_db_connection, init_db
 from backend.initial_data import seed_data
 from backend.models import PPDBRegistrationCreate, PesanKontakCreate, RaportCheckRequest, AIQueryRequest
+from backend.auth import (
+    hash_password, verify_password, create_session_token,
+    get_current_user, COOKIE_NAME, SESSION_DURATION_SECONDS
+)
 
 # Initialize Database & Seed data if necessary
 try:
@@ -219,15 +223,117 @@ async def portal_page(request: Request):
         }
     )
 
+@app.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request):
+    """Login Portal for Master and Admin accounts."""
+    user = get_current_user(request)
+    if user:
+        return RedirectResponse(url="/admin", status_code=303)
+    return templates.TemplateResponse(
+        request=request,
+        name="login.html",
+        context={
+            "school": SCHOOL_INFO,
+            "active_page": "login"
+        }
+    )
+
+@app.post("/api/auth/login")
+async def api_auth_login(
+    request: Request,
+    username: str = Form(...),
+    password: str = Form(...)
+):
+    """Authenticate Master or Admin credentials and issue secure session cookie."""
+    clean_username = username.strip().lower()
+    conn = get_db_connection()
+    user_row = conn.execute(
+        "SELECT * FROM users WHERE username = ? AND is_active = 1",
+        (clean_username,)
+    ).fetchone()
+
+    if not user_row or not verify_password(password, user_row["password_hash"]):
+        conn.close()
+        raise HTTPException(
+            status_code=401,
+            detail="Nama pengguna (username) atau kata sandi tidak sesuai. Silakan periksa kembali."
+        )
+
+    # Update last login timestamp
+    conn.execute("UPDATE users SET last_login = CURRENT_TIMESTAMP WHERE id = ?", (user_row["id"],))
+    conn.commit()
+    conn.close()
+
+    token = create_session_token(
+        user_id=user_row["id"],
+        username=user_row["username"],
+        role=user_row["role"],
+        nama_lengkap=user_row["nama_lengkap"]
+    )
+
+    response = JSONResponse({
+        "status": "success",
+        "message": "Login berhasil! Selamat datang di Portal Manajemen.",
+        "user": {
+            "id": user_row["id"],
+            "username": user_row["username"],
+            "role": user_row["role"],
+            "nama_lengkap": user_row["nama_lengkap"],
+            "email": user_row["email"]
+        }
+    })
+
+    # Set secure HttpOnly session cookie
+    response.set_cookie(
+        key=COOKIE_NAME,
+        value=token,
+        max_age=SESSION_DURATION_SECONDS,
+        httponly=True,
+        samesite="lax",
+        secure=False
+    )
+    return response
+
+@app.get("/logout")
+@app.post("/api/auth/logout")
+async def api_auth_logout():
+    """Sign out user and revoke session cookie."""
+    response = RedirectResponse(url="/login?notice=logged_out", status_code=303)
+    response.delete_cookie(key=COOKIE_NAME)
+    return response
+
+@app.get("/api/auth/me")
+async def api_auth_me(request: Request):
+    """Return profile of currently authenticated user."""
+    user = get_current_user(request)
+    if not user:
+        raise HTTPException(status_code=401, detail="Sesi login tidak ditemukan atau telah kedaluwarsa.")
+    return {"status": "success", "user": user}
+
 @app.get("/admin", response_class=HTMLResponse)
 async def admin_page(request: Request):
-    """Admin CMS Dashboard to view PPDB registrants, incoming contact messages, and quick stats."""
+    """Admin CMS Dashboard. Protected route requiring Master or Admin login."""
+    user = get_current_user(request)
+    if not user:
+        return RedirectResponse(url="/login?notice=silakan_login&redirect=/admin", status_code=303)
+
+    conn = get_db_connection()
+    all_users = []
+    if user["role"] == "master":
+        user_rows = conn.execute(
+            "SELECT id, username, nama_lengkap, role, email, is_active, created_at, last_login FROM users ORDER BY id ASC"
+        ).fetchall()
+        all_users = [dict(u) for u in user_rows]
+    conn.close()
+
     return templates.TemplateResponse(
         request=request,
         name="admin.html",
         context={
             "school": SCHOOL_INFO,
-            "active_page": "admin"
+            "active_page": "admin",
+            "user": user,
+            "all_users": all_users
         }
     )
 
@@ -674,6 +780,82 @@ async def api_admin_ppdb_update(
     conn.commit()
     conn.close()
     return {"status": "success", "message": "Status calon siswa berhasil diperbarui"}
+
+# ==================== MASTER ROLE: USER MANAGEMENT ====================
+
+@app.get("/api/admin/users")
+async def api_admin_list_users(request: Request):
+    """List all system users (Master-only)."""
+    current_user = get_current_user(request)
+    if not current_user or current_user["role"] != "master":
+        raise HTTPException(status_code=403, detail="Hanya Akun Master yang memiliki otorisasi melihat data pengguna.")
+
+    conn = get_db_connection()
+    rows = conn.execute("""
+    SELECT id, username, nama_lengkap, role, email, is_active, created_at, last_login 
+    FROM users 
+    ORDER BY id ASC
+    """).fetchall()
+    conn.close()
+    return {"status": "success", "data": [dict(r) for r in rows]}
+
+@app.post("/api/admin/users/create")
+async def api_admin_create_user(
+    request: Request,
+    username: str = Form(...),
+    password: str = Form(...),
+    nama_lengkap: str = Form(...),
+    role: str = Form("admin"),
+    email: str = Form("")
+):
+    """Create new admin/master account (Master-only)."""
+    current_user = get_current_user(request)
+    if not current_user or current_user["role"] != "master":
+        raise HTTPException(status_code=403, detail="Hanya Akun Master yang berhak membuat akun baru.")
+
+    clean_username = username.strip().lower()
+    if len(clean_username) < 3:
+        raise HTTPException(status_code=400, detail="Username minimal 3 karakter.")
+    if len(password) < 6:
+        raise HTTPException(status_code=400, detail="Kata sandi minimal 6 karakter.")
+
+    conn = get_db_connection()
+    exists = conn.execute("SELECT id FROM users WHERE username = ?", (clean_username,)).fetchone()
+    if exists:
+        conn.close()
+        raise HTTPException(status_code=400, detail=f"Username '{clean_username}' sudah digunakan.")
+
+    hashed_pw = hash_password(password)
+    conn.execute("""
+    INSERT INTO users (username, password_hash, nama_lengkap, role, email, is_active)
+    VALUES (?, ?, ?, ?, ?, 1)
+    """, (clean_username, hashed_pw, nama_lengkap.strip(), role, email.strip()))
+    conn.commit()
+    conn.close()
+
+    return {"status": "success", "message": f"Akun '{clean_username}' ({role.upper()}) berhasil dibuat!"}
+
+@app.post("/api/admin/users/reset-password")
+async def api_admin_reset_password(
+    request: Request,
+    user_id: int = Form(...),
+    new_password: str = Form(...)
+):
+    """Reset password for a user (Master-only)."""
+    current_user = get_current_user(request)
+    if not current_user or current_user["role"] != "master":
+        raise HTTPException(status_code=403, detail="Hanya Akun Master yang dapat mereset kata sandi.")
+
+    if len(new_password) < 6:
+        raise HTTPException(status_code=400, detail="Kata sandi baru minimal 6 karakter.")
+
+    conn = get_db_connection()
+    hashed_pw = hash_password(new_password)
+    conn.execute("UPDATE users SET password_hash = ? WHERE id = ?", (hashed_pw, user_id))
+    conn.commit()
+    conn.close()
+
+    return {"status": "success", "message": "Kata sandi pengguna berhasil diperbarui!"}
 
 # PWA Manifest & Service Worker
 @app.get("/manifest.json")

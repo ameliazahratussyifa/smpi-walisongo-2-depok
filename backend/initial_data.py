@@ -301,6 +301,33 @@ Majelis Khotmil Qur'an kali ini dipimpin oleh Asatidz Pengasuh Tahfidz sebagai i
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, demo_ppdb)
 
+    # 7. Seed Akun Master & Admin
+    from backend.auth import hash_password
+    cursor.execute("SELECT COUNT(*) FROM users")
+    if cursor.fetchone()[0] == 0:
+        default_users = [
+            (
+                "master",
+                hash_password("MasterWalisongo2026!"),
+                "Master Administrator (Super Admin)",
+                "master",
+                "master@smpiwalisongo2depok.sch.id",
+                1
+            ),
+            (
+                "admin",
+                hash_password("AdminWalisongo2026!"),
+                "Admin Staf TU & Panitia PPDB",
+                "admin",
+                "admin@smpiwalisongo2depok.sch.id",
+                1
+            )
+        ]
+        cursor.executemany("""
+        INSERT INTO users (username, password_hash, nama_lengkap, role, email, is_active)
+        VALUES (?, ?, ?, ?, ?, ?)
+        """, default_users)
+
     conn.commit()
     conn.close()
 
