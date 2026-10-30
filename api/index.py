@@ -57,17 +57,28 @@ templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 @app.middleware("http")
 async def vercel_path_normalizer(request: Request, call_next):
     """
-    On Vercel, catch-all rewrites direct traffic to /api/index.py.
-    This middleware restores the original requested path from Vercel's
-    'x-matched-path' or 'x-forwarded-uri' headers, or strips the /api/index.py prefix.
+    On Vercel, catch-all rewrites direct traffic to /api/index.py?__path=/$1.
+    This middleware restores the original requested path from the __path query parameter,
+    Vercel headers, or falls back to /.
     """
-    matched_path = request.headers.get("x-matched-path") or request.headers.get("x-forwarded-uri")
-    if matched_path:
-        clean_path = matched_path.split("?")[0]
-        if not clean_path.startswith("/api/index.py"):
-            request.scope["path"] = clean_path
-        elif clean_path == "/api/index.py":
-            request.scope["path"] = "/"
+    target_path = None
+
+    # 1. Query parameter passed by Vercel rewrite (?__path=...)
+    path_param = request.query_params.get("__path")
+    if path_param:
+        target_path = path_param if path_param.startswith("/") else f"/{path_param}"
+
+    # 2. Header fallback
+    if not target_path or target_path in ("/api/index.py", "/api/index.py/"):
+        matched_path = request.headers.get("x-matched-path") or request.headers.get("x-forwarded-uri")
+        if matched_path and not matched_path.startswith("/api/index.py"):
+            target_path = matched_path.split("?")[0]
+
+    # 3. Path cleanup
+    if target_path:
+        while target_path.startswith("//"):
+            target_path = target_path[1:]
+        request.scope["path"] = target_path
     else:
         current_path = request.scope.get("path", "")
         if current_path in ("/api/index.py", "/api"):
@@ -128,12 +139,6 @@ SCHOOL_INFO = {
 @app.get("/api/index.py", response_class=HTMLResponse)
 async def home_page(request: Request):
     """Main Web Portal with stunning modern UI, responsive for all devices."""
-    if "x-debug-inspect" in request.headers:
-        return JSONResponse({
-            "scope_path": request.scope.get("path"),
-            "headers": dict(request.headers)
-        })
-
     conn = get_db_connection()
     berita_list = conn.execute("SELECT * FROM berita ORDER BY id DESC LIMIT 4").fetchall()
     guru_list = conn.execute("SELECT * FROM guru ORDER BY urutan ASC LIMIT 6").fetchall()
