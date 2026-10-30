@@ -1,0 +1,20 @@
+{
+  "name": "SMP Islam Walisongo 2 Depok",
+  "short_name": "SMPI Walisongo 2",
+  "description": "Portal Resmi, Sistem Informasi Akademik & PPDB Online SMP Islam Walisongo 2 Depok",
+  "start_url": "/mobile",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#044e3f",
+  "theme_color": "#044e3f",
+  "categories": ["education", "school", "islamic"],
+  "icons": [
+    {
+      "src": "/static/images/logo-walisongo.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgHead" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#047857"/>
+      <stop offset="100%" stop-color="#064E3B"/>
+    </linearGradient>
+    <linearGradient id="hijabGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#065F46"/>
+      <stop offset="100%" stop-color="#022C22"/>
+    </linearGradient>
+    <linearGradient id="skinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FDDEC0"/>
+      <stop offset="100%" stop-color="#F7C49D"/>
+    </linearGradient>
+    <linearGradient id="blazerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E3A8A"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    <linearGradient id="goldGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE047"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" rx="30" fill="url(#bgHead)"/>
+  
+  <!-- Subtle Islamic Geometric Halo -->
+  <circle cx="200" cy="180" r="140" fill="none" stroke="url(#goldGlow)" stroke-width="2" opacity="0.3" stroke-dasharray="8,6"/>
+  <circle cx="200" cy="180" r="160" fill="none" stroke="#10B981" stroke-width="1.5" opacity="0.2"/>
+
+  <!-- Shoulders & Blazer -->
+  <path d="M 80 400 C 80 300, 140 280, 200 280 C 260 280, 320 300, 320 400 Z" fill="url(#blazerGrad)"/>
+  <!-- Gold brooch / pin -->
+  <circle cx="250" cy="320" r="12" fill="url(#goldGlow)"/>
+  <!-- Inner White Blouse Collar -->
+  <polygon points="175,275 225,275 200,320" fill="#FFFFFF"/>
+
+  <!-- Hijab Drape -->
+  <path d="M 120 230 C 100 280, 110 370, 140 400 L 260 400 C 290 370, 300 280, 280 230 Z" fill="url(#hijabGrad)"/>
+  
+  <!-- Head & Hijab Wrap -->
+  <path d="M 130 180 C 130 90, 270 90, 270 180 C 270 240, 230 270, 200 270 C 170 270, 130 240, 130 180 Z" fill="url(#hijabGrad)"/>
+
+  <!-- Face Oval -->
+  <ellipse cx="200" cy="185" rx="52" ry="62" fill="url(#skinGrad)"/>
+
+  <!-- Hijab Inner Cap (Ciput) -->
+  <path d="M 152 165 C 165 145, 235 145, 248 165 C 240 148, 160 148, 152 165 Z" fill="#FCD34D"/>
+
+  <!-- Eyebrows -->
+  <path d="M 165 165 Q 180 160 192 166" stroke="#451A03" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <path d="M 208 166 Q 220 160 235 165" stroke="#451A03" stroke-width="3" stroke-linecap="round" fill="none"/>
+
+  <!-- Eyes with pleasant scholarly expression -->
+  <ellipse cx="178" cy="178" rx="8" ry="5" fill="#1C1917"/>
+  <circle cx="176" cy="176" r="2" fill="#FFFFFF"/>
+  <ellipse cx="222" cy="178" rx="8" ry="5" fill="#1C1917"/>
+  <circle cx="220" cy="176" r="2" fill="#FFFFFF"/>
+
+  <!-- Nose -->
+  <path d="M 200 178 L 198 198 Q 200 201 204 199" stroke="#D97706" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+
+  <!-- Gentle Smile -->
+  <path d="M 185 215 Q 200 226 215 215" stroke="#BE123C" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+
+  <!-- Framed Glasses for Professional Educator look -->
+  <rect x="160" y="168" width="34" height="22" rx="6" fill="none" stroke="url(#goldGlow)" stroke-width="2.5"/>
+  <rect x="206" y="168" width="34" height="22" rx="6" fill="none" stroke="url(#goldGlow)" stroke-width="2.5"/>
+  <line x1="194" y1="178" x2="206" y2="178" stroke="url(#goldGlow)" stroke-width="2.5"/>
+
+  <!-- Verified Badge -->
+  <g transform="translate(290, 40)">
+    <circle cx="25" cy="25" r="25" fill="#F59E0B"/>
+    <path d="M 15 25 L 22 32 L 35 18" stroke="#064E3B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </g>
+</svg>

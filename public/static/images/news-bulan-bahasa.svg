@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450">
+  <defs>
+    <linearGradient id="bg_news-b" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0c4a6e"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" rx="16" fill="url(#bg_news-b)"/>
+  <circle cx="700" cy="80" r="180" fill="#ffffff" opacity="0.05"/>
+  <circle cx="100" cy="380" r="140" fill="#fbbf24" opacity="0.08"/>
+  <rect x="60" y="60" width="180" height="34" rx="17" fill="#fbbf24"/>
+  <text x="150" y="83" fill="#043c2e" font-family="sans-serif" font-size="13" font-weight="900" text-anchor="middle">BULAN BAHASA & ARAB</text>
+  <text x="60" y="200" fill="#ffffff" font-family="sans-serif" font-size="34" font-weight="800">GEBYAR LITERASI SANTRI</text>
+  <text x="60" y="240" fill="#a7f3d0" font-family="sans-serif" font-size="18" font-weight="600">PENTAS TIGA BAHASA</text>
+  <rect x="60" y="320" width="220" height="44" rx="22" fill="#ffffff" opacity="0.95"/>
+  <text x="170" y="348" fill="#0c4a6e" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle">SMP ISLAM WALISONGO 2</text>
+</svg>
