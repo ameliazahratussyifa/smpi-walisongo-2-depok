@@ -22,3 +22,5 @@ walisongo.db
 .DS_Store
 Thumbs.db
 .vercel
+.next/
+node_modules/
