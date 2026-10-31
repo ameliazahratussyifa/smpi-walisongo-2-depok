@@ -1,26 +1,63 @@
-# Python bytecode & cache
+# ==============================================================================
+# SECRETS & CONFIDENTIAL DATA (SANGAT PENTING: JANGAN DIKOMIT KE REPOSITORY)
+# ==============================================================================
+# Environment Variables & API Keys
+.env
+.env.*
+!.env.example
+*.local
+
+# Database & SQLite files (berisi data rahasia santri, raport, registrasi)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+walisongo.db
+/tmp/walisongo.db
+
+# SSL / Private Keys / Certificates
+*.pem
+*.key
+*.crt
+*.pfx
+*.p12
+credentials.json
+service-account*.json
+secrets.json
+
+# Application Logs & Crash Dumps
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ==============================================================================
+# RUNTIME & BUILD ARTIFACTS
+# ==============================================================================
+# Python bytecode & Virtual Environments
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
-
-# Virtual Environment
 .venv/
 venv/
 ENV/
 env/
 
-# Database & Runtime
-*.log
-walisongo.db
-/tmp/walisongo.db
+# Next.js & Node Modules
+.next/
+out/
+build/
+dist/
+node_modules/
+.vercel
 
-# IDE & OS
+# IDE & Operating System Caches
 .vscode/
 .idea/
 .DS_Store
 Thumbs.db
-.vercel
-.next/
-node_modules/

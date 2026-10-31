@@ -194,11 +194,12 @@ export default function Modals() {
       const res = await fetch('/api/ai/ask', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: q }),
+        body: JSON.stringify({ pertanyaan: q }),
       });
       const data = await res.json();
-      if (res.ok && data.answer) {
-        setAiMessages([...newMsgs, { role: 'bot', text: data.answer }]);
+      const botAnswer = data.jawaban || data.answer;
+      if (res.ok && botAnswer) {
+        setAiMessages([...newMsgs, { role: 'bot', text: botAnswer }]);
       } else {
         setAiMessages([
           ...newMsgs,
